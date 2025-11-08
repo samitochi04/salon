@@ -22,21 +22,26 @@ const env = {
   supabaseUrl: process.env.SUPABASE_URL,
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
   supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
-  resendApiKey: process.env.RESEND_API_KEY,
   emailFrom: process.env.EMAIL_FROM,
   adminInbox: process.env.ADMIN_INBOX,
+  smtpHost: process.env.SMTP_HOST,
+  smtpPort: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined,
+  smtpUser: process.env.SMTP_USER,
+  smtpPass: process.env.SMTP_PASS,
+  smtpSecure: process.env.SMTP_SECURE,
 };
 
 const requiredAtRuntime = [
   "supabaseUrl",
   "supabaseServiceRoleKey",
   "supabaseAnonKey",
-  "resendApiKey",
   "emailFrom",
   "adminInbox",
+  "smtpHost",
+  "smtpPort",
 ];
 
-const missing = requiredAtRuntime.filter((key) => !env[key]);
+const missing = requiredAtRuntime.filter((key) => env[key] === undefined || env[key] === null || env[key] === "");
 if (missing.length > 0 && env.nodeEnv !== "test") {
   // eslint-disable-next-line no-console
   console.warn(

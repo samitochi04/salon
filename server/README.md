@@ -3,7 +3,7 @@
 ## Tech Stack
 - Node.js + Express.js for RESTful + HTMX-friendly endpoints
 - Supabase client SDK for database access and auth integration
-- Resend SDK for transactional email delivery
+- Nodemailer for transactional email delivery via your SMTP provider
 
 ## High-Level Structure
 - `src/`
@@ -22,6 +22,7 @@
 - `cross-env` + dotenv for local env management; production secrets from managed store
 - Helmet, morgan, CORS configuration, and request logging
 - Centralized error handling with HTMX-aware JSON responses (decorated later with fragments)
+- Nodemailer SMTP transport with audit trail persisted to `salon.notification_log`
 
 ### Commands
 - `npm run dev` – start nodemon with live reload

@@ -1,38 +1,61 @@
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
 const { env } = require("./env");
 
-let cached;
+let cachedTransporter;
 
-function getMailClient() {
-  if (!env.resendApiKey) {
-    throw new Error("Resend API key missing");
+function resolveSecure(port, flag) {
+  if (typeof flag === "string") {
+    return flag.toLowerCase() === "true";
   }
-
-  if (!cached) {
-    cached = new Resend(env.resendApiKey);
+  if (typeof flag === "boolean") {
+    return flag;
   }
-
-  return cached;
+  return Number(port) === 465;
 }
 
-async function sendEmail({ to, subject, html }) {
-  const client = getMailClient();
+function getTransporter() {
+  if (cachedTransporter) return cachedTransporter;
+  if (!env.smtpHost || !env.smtpPort) {
+    throw new Error("SMTP credentials are missing");
+  }
+
+  const secure = resolveSecure(env.smtpPort, env.smtpSecure);
+
+  cachedTransporter = nodemailer.createTransport({
+    host: env.smtpHost,
+    port: Number(env.smtpPort),
+    secure,
+    auth:
+      env.smtpUser && env.smtpPass
+        ? {
+            user: env.smtpUser,
+            pass: env.smtpPass,
+          }
+        : undefined,
+  });
+
+  return cachedTransporter;
+}
+
+async function sendEmail({ to, subject, html, text }) {
+  const transporter = getTransporter();
   const from = env.emailFrom;
 
   if (!from) {
     throw new Error("EMAIL_FROM not configured");
   }
 
-  return client.emails.send({
+  return transporter.sendMail({
     from,
     to,
     subject,
     html,
+    text,
   });
 }
 
 module.exports = {
-  getMailClient,
+  getTransporter,
   sendEmail,
 };
 

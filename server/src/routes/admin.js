@@ -1,20 +1,13 @@
 const { Router } = require("express");
 
 const router = Router();
+const adminController = require("../controllers/adminController");
+const { requireStaff } = require("../middlewares/requireStaff");
 
-router.get("/bookings", (_req, res) => {
-  res.status(501).json({
-    status: "pending",
-    message: "Admin bookings feed not implemented yet.",
-  });
-});
+router.use(requireStaff);
 
-router.patch("/bookings/:bookingId", (_req, res) => {
-  res.status(501).json({
-    status: "pending",
-    message: "Update booking endpoint not implemented yet.",
-  });
-});
+router.get("/bookings", adminController.listBookings);
+router.patch("/bookings/:bookingId", adminController.updateBooking);
 
 module.exports = router;
 

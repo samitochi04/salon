@@ -1,20 +1,10 @@
 const { Router } = require("express");
 
 const router = Router();
+const publicController = require("../controllers/publicController");
 
-router.get("/services", (_req, res) => {
-  res.status(501).json({
-    status: "pending",
-    message: "Service catalog endpoint not implemented yet.",
-  });
-});
-
-router.post("/bookings", (_req, res) => {
-  res.status(501).json({
-    status: "pending",
-    message: "Booking submission endpoint not implemented yet.",
-  });
-});
+router.get("/services", publicController.getServices);
+router.post("/bookings", publicController.createBooking);
 
 module.exports = router;
 

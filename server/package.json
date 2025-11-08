@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon src/server.js",
     "start": "cross-env NODE_ENV=production node src/server.js",
-    "lint": "eslint \"src/**/*.js\"",
-    "lint:fix": "eslint \"src/**/*.js\" --fix",
+    "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --config .eslintrc.cjs \"src/**/*.js\"",
+    "lint:fix": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --config .eslintrc.cjs \"src/**/*.js\" --fix",
     "format": "prettier --check \"src/**/*.{js,json}\"",
     "format:fix": "prettier --write \"src/**/*.{js,json}\"",
     "test": "echo \"Add tests with npm run test\" && exit 0"
@@ -23,7 +23,6 @@
     "helmet": "^8.1.0",
     "morgan": "^1.10.1",
     "nodemailer": "^7.0.10",
-    "resend": "^6.4.2",
     "zod": "^4.1.12"
   },
   "devDependencies": {
