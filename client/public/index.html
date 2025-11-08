@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Radiant Bloom Salon</title>
+    <link rel="stylesheet" href="/assets/tailwind.css" />
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js" integrity="sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz" crossorigin="anonymous"></script>
+  </head>
+  <body class="bg-gradient-to-br from-brand-50 via-white to-rose-100 text-slate-800 antialiased">
+    <div
+      id="app"
+      class="min-h-screen"
+      hx-get="/partials/home.html"
+      hx-trigger="load delay:120ms"
+      hx-swap="innerHTML"
+      hx-target="this"
+    >
+      <div class="flex min-h-screen items-center justify-center">
+        <div class="h-16 w-16 animate-spin rounded-full border-[3px] border-brand-200 border-t-brand-500"></div>
+      </div>
+    </div>
+    <div id="modal-root"></div>
+    <script type="module" src="/scripts/bootstrap.js"></script>
+    <script type="module" src="/scripts/booking.js"></script>
+  </body>
+</html>
