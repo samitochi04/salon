@@ -1,3 +1,5 @@
+const salon = (supabase) => supabase.schema("salon");
+
 function baseBookingSelect() {
   return `
     id,
@@ -27,16 +29,16 @@ function baseBookingSelect() {
 }
 
 async function createBooking(supabase, payload) {
-  return supabase
-    .from("salon.bookings")
+  return salon(supabase)
+    .from("bookings")
     .insert(payload)
     .select(baseBookingSelect())
     .single();
 }
 
 async function listBookings(supabase, { status, from, to, limit = 50 } = {}) {
-  let query = supabase
-    .from("salon.bookings")
+  let query = salon(supabase)
+    .from("bookings")
     .select(baseBookingSelect())
     .order("start_time", { ascending: true });
 
@@ -60,16 +62,16 @@ async function listBookings(supabase, { status, from, to, limit = 50 } = {}) {
 }
 
 async function getBookingById(supabase, bookingId) {
-  return supabase
-    .from("salon.bookings")
+  return salon(supabase)
+    .from("bookings")
     .select(baseBookingSelect())
     .eq("id", bookingId)
     .maybeSingle();
 }
 
 async function updateBooking(supabase, bookingId, updates) {
-  return supabase
-    .from("salon.bookings")
+  return salon(supabase)
+    .from("bookings")
     .update(updates)
     .eq("id", bookingId)
     .select(baseBookingSelect())
@@ -77,11 +79,11 @@ async function updateBooking(supabase, bookingId, updates) {
 }
 
 async function addBookingNote(supabase, notePayload) {
-  return supabase.from("salon.booking_notes").insert(notePayload);
+  return salon(supabase).from("booking_notes").insert(notePayload);
 }
 
 async function logNotification(supabase, payload) {
-  return supabase.from("salon.notification_log").insert(payload);
+  return salon(supabase).from("notification_log").insert(payload);
 }
 
 module.exports = {

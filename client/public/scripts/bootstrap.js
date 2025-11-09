@@ -207,7 +207,7 @@ function hydrateFadeIns(root = document) {
 }
 
 function hydrateNav(root = document) {
-  const header = root.querySelector("[data-site-header]");
+  const header = document.querySelector("[data-site-header]");
   if (header && !header.dataset.boundScroll) {
     header.dataset.boundScroll = "true";
     const handler = () => {
@@ -221,13 +221,34 @@ function hydrateNav(root = document) {
     window.addEventListener("scroll", handler, { passive: true });
   }
 
-  const toggler = root.querySelector("[data-nav-toggle]");
-  const menu = root.querySelector("[data-nav-menu]");
-  if (toggler && menu && !toggler.dataset.boundToggle) {
-    toggler.dataset.boundToggle = "true";
-    toggler.addEventListener("click", () => {
-      menu.classList.toggle("translate-x-full");
-      document.body.classList.toggle("overflow-hidden", !menu.classList.contains("translate-x-full"));
+  const menu = document.querySelector("[data-nav-menu]");
+  if (!menu) return;
+
+  const toggles = document.querySelectorAll("[data-nav-toggle]");
+  toggles.forEach((toggle) => {
+    if (toggle.dataset.boundToggle === "true") return;
+    toggle.dataset.boundToggle = "true";
+    toggle.addEventListener("click", () => {
+      const isHidden = menu.classList.contains("translate-x-full");
+      if (isHidden) {
+        menu.classList.remove("translate-x-full");
+        document.body.classList.add("overflow-hidden");
+      } else {
+        menu.classList.add("translate-x-full");
+        document.body.classList.remove("overflow-hidden");
+      }
+    });
+  });
+
+  if (!menu.dataset.boundAutoClose) {
+    menu.dataset.boundAutoClose = "true";
+    menu.querySelectorAll("a, button").forEach((node) => {
+      node.addEventListener("click", () => {
+        if (!menu.classList.contains("translate-x-full")) {
+          menu.classList.add("translate-x-full");
+          document.body.classList.remove("overflow-hidden");
+        }
+      });
     });
   }
 }
@@ -270,6 +291,12 @@ function renderServiceCards(root = document) {
             duration_minutes: info.duration,
             price_cents: info.price_cents ?? null,
           }));
+
+  if (!list.length) {
+    container.innerHTML =
+      '<div class="rounded-3xl bg-white/80 p-6 text-sm text-slate-600">Notre carte de rituels sera dévoilée très prochainement.</div>';
+    return;
+  }
 
   const markup = list
     .map((service) => {

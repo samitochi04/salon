@@ -14,6 +14,14 @@ const {
 const { notifyCustomerBookingReceived, notifyAdminBookingReceived, notifyCustomerStatusUpdate } = require("./notificationService");
 const { createHttpError } = require("../utils/httpError");
 const { unwrap } = require("../utils/supabase");
+const { listStaffForService } = require("../repositories/staffRepository");
+const {
+  listShiftBlocks,
+  listBusyBlocks,
+  listBookingsForStaff,
+} = require("../repositories/availabilityRepository");
+
+const SCHEDULING_WINDOW_DAYS = 42;
 
 const bookingRequestSchema = z.object({
   full_name: z.string().min(2).max(120),
@@ -57,9 +65,220 @@ function generateConfirmationCode() {
   return `RB-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
 }
 
+function addDays(date, days) {
+  const clone = new Date(date.getTime());
+  clone.setDate(clone.getDate() + days);
+  return clone;
+}
+
+function startOfDay(date) {
+  const clone = new Date(date.getTime());
+  clone.setHours(0, 0, 0, 0);
+  return clone;
+}
+
+function formatDateKey(date) {
+  return date.toLocaleDateString("en-CA"); // YYYY-MM-DD in local timezone
+}
+
+function formatTimeLabel(date) {
+  return date.toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
+function normalizeRange(range = {}) {
+  const now = startOfDay(new Date());
+  const from =
+    range.from instanceof Date
+      ? startOfDay(range.from)
+      : range.from
+        ? startOfDay(new Date(range.from))
+        : now;
+
+  const toCandidate =
+    range.to instanceof Date ? new Date(range.to) : range.to ? new Date(range.to) : addDays(from, SCHEDULING_WINDOW_DAYS);
+
+  const to = toCandidate <= from ? addDays(from, 1) : toCandidate;
+
+  return {
+    from,
+    to,
+    fromISO: from.toISOString(),
+    toISO: to.toISOString(),
+  };
+}
+
+function overlaps(aStart, aEnd, bStart, bEnd) {
+  return aStart < bEnd && aEnd > bStart;
+}
+
+async function getStaffIdsForService(supabase, serviceId) {
+  const rows = unwrap(await listStaffForService(supabase, serviceId));
+  return rows
+    .map((row) => row.staff?.id ?? row.staff_id ?? null)
+    .filter((id) => typeof id === "string");
+}
+
+async function loadSchedulingArtifacts(supabase, staffIds, range) {
+  if (!staffIds.length) {
+    return {
+      shifts: [],
+      busy: [],
+      bookings: [],
+    };
+  }
+
+  const [shiftsRaw, busyRaw, bookingsRaw] = await Promise.all([
+    listShiftBlocks(supabase, staffIds, range.fromISO, range.toISO),
+    listBusyBlocks(supabase, staffIds, range.fromISO, range.toISO),
+    listBookingsForStaff(supabase, staffIds, range.fromISO, range.toISO),
+  ]);
+
+  const shifts = unwrap(shiftsRaw);
+  const busy = unwrap(busyRaw);
+  const bookings = unwrap(bookingsRaw);
+
+  return { shifts, busy, bookings };
+}
+
+function buildBusyLookup(staffIds, busyBlocks, bookings) {
+  const busyByStaff = new Map();
+  staffIds.forEach((id) => busyByStaff.set(id, []));
+
+  const register = (staffId, start, end) => {
+    if (!busyByStaff.has(staffId)) busyByStaff.set(staffId, []);
+    busyByStaff.get(staffId).push({ start, end });
+  };
+
+  busyBlocks.forEach((block) => {
+    const start = new Date(block.starts_at);
+    const end = new Date(block.ends_at);
+    register(block.staff_id, start, end);
+  });
+
+  bookings.forEach((booking) => {
+    const start = new Date(booking.start_time);
+    const end = new Date(booking.end_time);
+    register(booking.staff_id, start, end);
+  });
+
+  return busyByStaff;
+}
+
+function generateSlotsForShift(shift, durationMs, busyByStaff, range) {
+  const slots = [];
+  const blockStart = new Date(shift.starts_at);
+  const blockEnd = new Date(shift.ends_at);
+
+  const windowStart = blockStart < range.from ? range.from : blockStart;
+  const windowEnd = blockEnd > range.to ? range.to : blockEnd;
+
+  let cursor = new Date(windowStart);
+  const staffBusy = busyByStaff.get(shift.staff_id) ?? [];
+
+  while (cursor.getTime() + durationMs <= windowEnd.getTime()) {
+    const slotEnd = new Date(cursor.getTime() + durationMs);
+    const hasConflict = staffBusy.some((entry) =>
+      overlaps(cursor, slotEnd, entry.start, entry.end),
+    );
+    if (!hasConflict) {
+      slots.push({
+        staff_id: shift.staff_id,
+        start: new Date(cursor),
+        end: slotEnd,
+      });
+    }
+    cursor = new Date(cursor.getTime() + durationMs);
+  }
+
+  return slots;
+}
+
+async function buildAvailabilityMatrix(supabase, service, rangeInput) {
+  const range = normalizeRange(rangeInput);
+  const staffIds = await getStaffIdsForService(supabase, service.id);
+
+  if (!staffIds.length) {
+    return {
+      availability: {},
+      staffIds,
+      range,
+    };
+  }
+
+  const artifacts = await loadSchedulingArtifacts(supabase, staffIds, range);
+  const busyLookup = buildBusyLookup(staffIds, artifacts.busy, artifacts.bookings);
+  const durationMs = Number(service.duration_minutes) * 60000;
+
+  const availabilityMap = new Map();
+
+  artifacts.shifts.forEach((shift) => {
+    const slots = generateSlotsForShift(shift, durationMs, busyLookup, range);
+    slots.forEach((slot) => {
+      const dateKey = formatDateKey(slot.start);
+      if (!availabilityMap.has(dateKey)) {
+        availabilityMap.set(dateKey, new Map());
+      }
+      const timeMap = availabilityMap.get(dateKey);
+      const timeKey = formatTimeLabel(slot.start);
+      if (!timeMap.has(timeKey)) {
+        timeMap.set(timeKey, new Set());
+      }
+      timeMap.get(timeKey).add(slot.staff_id);
+    });
+  });
+
+  const availability = {};
+  availabilityMap.forEach((timeMap, dateKey) => {
+    const sortedTimes = Array.from(timeMap.keys()).sort();
+    availability[dateKey] = {};
+    sortedTimes.forEach((timeKey) => {
+      availability[dateKey][timeKey] = Array.from(timeMap.get(timeKey));
+    });
+  });
+
+  return {
+    availability,
+    staffIds,
+    range,
+  };
+}
+
 async function getPublicServices(supabase) {
   const data = unwrap(await listActiveServices(supabase));
   return data;
+}
+
+async function getServiceAvailability(supabase, { serviceSlug, from, to } = {}) {
+  const service = unwrap(
+    await getServiceBySlug(supabase, serviceSlug),
+    {
+      notFoundMessage: "Service introuvable.",
+    },
+  );
+
+  const availabilityMatrix = await buildAvailabilityMatrix(supabase, service, {
+    from: from ? new Date(from) : undefined,
+    to: to ? new Date(to) : undefined,
+  });
+
+  return {
+    service: {
+      id: service.id,
+      slug: service.slug,
+      name: service.name,
+      duration_minutes: service.duration_minutes,
+      description: service.description,
+    },
+    availability: availabilityMatrix.availability,
+    window: {
+      from: availabilityMatrix.range.fromISO,
+      to: availabilityMatrix.range.toISO,
+    },
+  };
 }
 
 async function createPublicBooking(supabase, payload) {
@@ -75,9 +294,26 @@ async function createPublicBooking(supabase, payload) {
   const start = buildDateTime(input.appointment_date, `${input.appointment_time}`);
   const end = new Date(start.getTime() + Number(service.duration_minutes) * 60000);
 
+  const dayRange = {
+    from: startOfDay(start),
+    to: addDays(startOfDay(start), 1),
+  };
+  const dailyAvailability = await buildAvailabilityMatrix(supabase, service, dayRange);
+  const dateKey = formatDateKey(start);
+  const timeKey = formatTimeLabel(start);
+  const availableStaff = dailyAvailability.availability[dateKey]?.[timeKey];
+
+  if (!availableStaff || availableStaff.length === 0) {
+    throw createHttpError(
+      409,
+      "Le créneau sélectionné n’est plus disponible. Merci de choisir un autre horaire.",
+    );
+  }
+
   const bookingPayload = {
     confirmation_code: generateConfirmationCode(),
     service_id: service.id,
+    staff_id: availableStaff[0],
     customer_full_name: input.full_name,
     customer_email: input.email,
     customer_phone: input.phone ?? null,
@@ -157,6 +393,7 @@ async function updateBookingAdmin(supabase, bookingId, body, staff) {
 
 module.exports = {
   getPublicServices,
+  getServiceAvailability,
   createPublicBooking,
   fetchBookings,
   updateBookingAdmin,

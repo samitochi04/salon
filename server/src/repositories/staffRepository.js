@@ -1,6 +1,8 @@
+const salon = (supabase) => supabase.schema("salon");
+
 async function findStaffByAuthUserId(supabase, authUserId) {
-  return supabase
-    .from("salon.staff")
+  return salon(supabase)
+    .from("staff")
     .select(
       `
         id,
@@ -13,8 +15,8 @@ async function findStaffByAuthUserId(supabase, authUserId) {
 }
 
 async function listStaffForService(supabase, serviceId) {
-  return supabase
-    .from("salon.staff_services")
+  return salon(supabase)
+    .from("staff_services")
     .select(
       `
         staff:staff_id (

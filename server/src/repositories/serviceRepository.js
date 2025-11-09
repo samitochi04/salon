@@ -1,6 +1,8 @@
+const salon = (supabase) => supabase.schema("salon");
+
 async function listActiveServices(supabase) {
-  return supabase
-    .from("salon.services")
+  return salon(supabase)
+    .from("services")
     .select(
       `
         id,
@@ -16,8 +18,8 @@ async function listActiveServices(supabase) {
 }
 
 async function getServiceBySlug(supabase, slug) {
-  return supabase
-    .from("salon.services")
+  return salon(supabase)
+    .from("services")
     .select(
       `
         id,

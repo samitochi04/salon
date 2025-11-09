@@ -15,6 +15,17 @@ const createBooking = asyncHandler(async (req, res) => {
   });
 });
 
+const getAvailability = asyncHandler(async (req, res) => {
+  const { serviceSlug } = req.params;
+  const { from, to } = req.query;
+  const availability = await bookingService.getServiceAvailability(req.supabase, {
+    serviceSlug,
+    from,
+    to,
+  });
+  res.json(availability);
+});
+
 const subscribeNewsletter = asyncHandler(async (req, res) => {
   const subscription = await newsletterService.subscribe(req.supabase, req.body);
   res.status(201).json({
@@ -26,5 +37,6 @@ const subscribeNewsletter = asyncHandler(async (req, res) => {
 module.exports = {
   getServices,
   createBooking,
+  getAvailability,
   subscribeNewsletter,
 };
