@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-rb-cream text-slate-900 antialiased;
+}
+
+a {
+  @apply text-rb-brown underline-offset-4 transition-colors duration-150;
+}
+
+a:hover {
+  @apply text-rb-gold;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  @apply outline-none ring-2 ring-offset-2 ring-rb-gold ring-offset-rb-cream;
+}

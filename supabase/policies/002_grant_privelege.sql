@@ -7,6 +7,9 @@ grant all privileges on all sequences in schema salon to service_role;
 
 -- Permettre à l’utilisateur public (anon) de lire le catalogue des services
 grant select on salon.services to anon;
+grant select on salon.services to authenticated;
+grant select on salon.staff to authenticated;
+grant select on salon.availability_blocks to authenticated;
 
 -- Optionnel : s’assurer que de futurs objets héritent de ces droits
 alter default privileges in schema salon grant all privileges on tables to service_role;

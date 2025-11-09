@@ -1,5 +1,7 @@
 const crypto = require("crypto");
 const { z } = require("zod");
+const { format } = require("date-fns");
+const { zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
 const {
   listActiveServices,
   getServiceBySlug,
@@ -12,14 +14,18 @@ const {
   addBookingNote,
 } = require("../repositories/bookingRepository");
 const { notifyCustomerBookingReceived, notifyAdminBookingReceived, notifyCustomerStatusUpdate } = require("./notificationService");
+const { DEFAULT_OPERATING_SETTINGS } = require("./scheduleService");
 const { createHttpError } = require("../utils/httpError");
 const { unwrap } = require("../utils/supabase");
 const { listStaffForService } = require("../repositories/staffRepository");
 const {
-  listShiftBlocks,
   listBusyBlocks,
   listBookingsForStaff,
 } = require("../repositories/availabilityRepository");
+const {
+  getOperatingSettings,
+  listClosedDays,
+} = require("../repositories/scheduleRepository");
 
 const SCHEDULING_WINDOW_DAYS = 42;
 
@@ -77,15 +83,17 @@ function startOfDay(date) {
   return clone;
 }
 
-function formatDateKey(date) {
-  return date.toLocaleDateString("en-CA"); // YYYY-MM-DD in local timezone
+function formatDateKey(date, timeZone = DEFAULT_OPERATING_SETTINGS.timezone) {
+  const zoned = utcToZonedTime(date, timeZone);
+  return format(zoned, "yyyy-MM-dd");
 }
 
-function formatTimeLabel(date) {
+function formatTimeLabel(date, timeZone = DEFAULT_OPERATING_SETTINGS.timezone) {
   return date.toLocaleTimeString("fr-FR", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
+    timeZone,
   });
 }
 
@@ -125,23 +133,133 @@ async function getStaffIdsForService(supabase, serviceId) {
 async function loadSchedulingArtifacts(supabase, staffIds, range) {
   if (!staffIds.length) {
     return {
-      shifts: [],
       busy: [],
       bookings: [],
     };
   }
 
-  const [shiftsRaw, busyRaw, bookingsRaw] = await Promise.all([
-    listShiftBlocks(supabase, staffIds, range.fromISO, range.toISO),
+  const [busyRaw, bookingsRaw] = await Promise.all([
     listBusyBlocks(supabase, staffIds, range.fromISO, range.toISO),
     listBookingsForStaff(supabase, staffIds, range.fromISO, range.toISO),
   ]);
 
-  const shifts = unwrap(shiftsRaw);
   const busy = unwrap(busyRaw);
   const bookings = unwrap(bookingsRaw);
 
-  return { shifts, busy, bookings };
+  return { busy, bookings };
+}
+
+function normalizeTimeValue(value) {
+  if (!value) return null;
+  const str = String(value);
+  return str.length >= 5 ? str.slice(0, 5) : str.padStart(5, "0");
+}
+
+async function resolveOperatingSettings(supabase) {
+  const result = await getOperatingSettings(supabase);
+  if (result.error) {
+    throw createHttpError(500, result.error.message, {
+      details: result.error.details,
+      hint: result.error.hint,
+    });
+  }
+
+  const record = result.data ?? {};
+  const openTime = normalizeTimeValue(record.open_time) ?? DEFAULT_OPERATING_SETTINGS.open_time;
+  const closeTime = normalizeTimeValue(record.close_time) ?? DEFAULT_OPERATING_SETTINGS.close_time;
+  const timezone = record.timezone ?? DEFAULT_OPERATING_SETTINGS.timezone;
+
+  if (openTime >= closeTime) {
+    throw createHttpError(500, "Operating hours misconfigured. Closing time must be after opening time.");
+  }
+
+  return {
+    openTime,
+    closeTime,
+    timezone,
+  };
+}
+
+async function fetchClosedDatesSet(supabase, range) {
+  const fromDate = range.fromISO.slice(0, 10);
+  const toDate = range.toISO.slice(0, 10);
+  const closedDays = unwrap(await listClosedDays(supabase, fromDate, toDate));
+  const set = new Set();
+  closedDays.forEach((row) => {
+    if (row?.closed_on) {
+      set.add(String(row.closed_on));
+    }
+  });
+  return set;
+}
+
+function pad(value) {
+  return String(value).padStart(2, "0");
+}
+
+function isoDateFromParts(year, month, day) {
+  return `${year}-${pad(month)}-${pad(day)}`;
+}
+
+function addUtcDays(date, days) {
+  const clone = new Date(date.getTime());
+  clone.setUTCDate(clone.getUTCDate() + days);
+  return clone;
+}
+
+function computeEasterSunday(year) {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(Date.UTC(year, month - 1, day, 12));
+}
+
+function computeFrenchHolidaySet(range, timeZone) {
+  const set = new Set();
+  const startYear = utcToZonedTime(range.from, timeZone).getFullYear();
+  const endYear = utcToZonedTime(range.to, timeZone).getFullYear();
+
+  for (let year = startYear - 1; year <= endYear + 1; year += 1) {
+    const easterSunday = computeEasterSunday(year);
+    const easterMonday = addUtcDays(easterSunday, 1);
+    const ascension = addUtcDays(easterSunday, 39);
+    const pentecostMonday = addUtcDays(easterSunday, 50);
+
+    [
+      isoDateFromParts(year, 1, 1), // Jour de l'An
+      easterMonday.toISOString().slice(0, 10),
+      isoDateFromParts(year, 5, 1), // Fête du Travail
+      isoDateFromParts(year, 5, 8), // Victoire 1945
+      ascension.toISOString().slice(0, 10),
+      pentecostMonday.toISOString().slice(0, 10),
+      isoDateFromParts(year, 7, 14), // Fête Nationale
+      isoDateFromParts(year, 8, 15), // Assomption
+      isoDateFromParts(year, 11, 1), // Toussaint
+      isoDateFromParts(year, 11, 11), // Armistice
+      isoDateFromParts(year, 12, 25), // Noël
+    ].forEach((dateKey) => set.add(dateKey));
+  }
+
+  return set;
+}
+
+function shouldSkipBusinessDay(zonedDate, dateKey, closureSet, holidaySet) {
+  const weekday = zonedDate.getDay();
+  if (weekday === 0 || weekday === 6) return true;
+  if (holidaySet.has(dateKey)) return true;
+  if (closureSet.has(dateKey)) return true;
+  return false;
 }
 
 function buildBusyLookup(staffIds, busyBlocks, bookings) {
@@ -209,27 +327,53 @@ async function buildAvailabilityMatrix(supabase, service, rangeInput) {
     };
   }
 
-  const artifacts = await loadSchedulingArtifacts(supabase, staffIds, range);
+  const [artifacts, schedule, closureSet] = await Promise.all([
+    loadSchedulingArtifacts(supabase, staffIds, range),
+    resolveOperatingSettings(supabase),
+    fetchClosedDatesSet(supabase, range),
+  ]);
+
   const busyLookup = buildBusyLookup(staffIds, artifacts.busy, artifacts.bookings);
   const durationMs = Number(service.duration_minutes) * 60000;
-
+  const holidaySet = computeFrenchHolidaySet(range, schedule.timezone);
   const availabilityMap = new Map();
 
-  artifacts.shifts.forEach((shift) => {
-    const slots = generateSlotsForShift(shift, durationMs, busyLookup, range);
-    slots.forEach((slot) => {
-      const dateKey = formatDateKey(slot.start);
-      if (!availabilityMap.has(dateKey)) {
-        availabilityMap.set(dateKey, new Map());
+  let cursor = startOfDay(range.from);
+  while (cursor < range.to) {
+    const zonedDate = utcToZonedTime(cursor, schedule.timezone);
+    const dateKey = format(zonedDate, "yyyy-MM-dd");
+
+    if (!shouldSkipBusinessDay(zonedDate, dateKey, closureSet, holidaySet)) {
+      const openUtc = zonedTimeToUtc(`${dateKey}T${schedule.openTime}`, schedule.timezone);
+      const closeUtc = zonedTimeToUtc(`${dateKey}T${schedule.closeTime}`, schedule.timezone);
+
+      if (closeUtc > openUtc) {
+        staffIds.forEach((staffId) => {
+          const virtualShift = {
+            staff_id: staffId,
+            starts_at: openUtc.toISOString(),
+            ends_at: closeUtc.toISOString(),
+          };
+
+          const slots = generateSlotsForShift(virtualShift, durationMs, busyLookup, range);
+          slots.forEach((slot) => {
+            const slotDateKey = formatDateKey(slot.start, schedule.timezone);
+            if (!availabilityMap.has(slotDateKey)) {
+              availabilityMap.set(slotDateKey, new Map());
+            }
+            const timeMap = availabilityMap.get(slotDateKey);
+            const timeKey = formatTimeLabel(slot.start, schedule.timezone);
+            if (!timeMap.has(timeKey)) {
+              timeMap.set(timeKey, new Set());
+            }
+            timeMap.get(timeKey).add(slot.staff_id);
+          });
+        });
       }
-      const timeMap = availabilityMap.get(dateKey);
-      const timeKey = formatTimeLabel(slot.start);
-      if (!timeMap.has(timeKey)) {
-        timeMap.set(timeKey, new Set());
-      }
-      timeMap.get(timeKey).add(slot.staff_id);
-    });
-  });
+    }
+
+    cursor = addDays(cursor, 1);
+  }
 
   const availability = {};
   availabilityMap.forEach((timeMap, dateKey) => {
@@ -294,13 +438,14 @@ async function createPublicBooking(supabase, payload) {
   const start = buildDateTime(input.appointment_date, `${input.appointment_time}`);
   const end = new Date(start.getTime() + Number(service.duration_minutes) * 60000);
 
+  const schedule = await resolveOperatingSettings(supabase);
   const dayRange = {
     from: startOfDay(start),
     to: addDays(startOfDay(start), 1),
   };
   const dailyAvailability = await buildAvailabilityMatrix(supabase, service, dayRange);
-  const dateKey = formatDateKey(start);
-  const timeKey = formatTimeLabel(start);
+  const dateKey = formatDateKey(start, schedule.timezone);
+  const timeKey = formatTimeLabel(start, schedule.timezone);
   const availableStaff = dailyAvailability.availability[dateKey]?.[timeKey];
 
   if (!availableStaff || availableStaff.length === 0) {

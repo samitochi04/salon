@@ -8,6 +8,11 @@ router.use(requireStaff);
 
 router.get("/bookings", adminController.listBookings);
 router.patch("/bookings/:bookingId", adminController.updateBooking);
+router.get("/schedule", adminController.getSchedule);
+router.put("/schedule", adminController.updateSchedule);
+router.get("/closures", adminController.listClosures);
+router.post("/closures", adminController.createClosure);
+router.delete("/closures/:closureId", adminController.deleteClosure);
 
 module.exports = router;
 

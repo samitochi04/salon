@@ -1,24 +1,38 @@
 {
   "name": "client",
-  "version": "1.0.0",
-  "description": "Beauty salon client powered by HTMX and Tailwind CSS",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "npm-run-all --parallel css:watch static:serve",
-    "static:serve": "npx live-server public --watch=public",
-    "css:watch": "tailwindcss -i ./src/styles/tailwind.css -o ./public/assets/tailwind.css --watch",
-    "css:build": "tailwindcss -i ./src/styles/tailwind.css -o ./public/assets/tailwind.css --minify",
-    "build": "npm run css:build"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.80.0",
+    "@tanstack/react-query": "^5.90.7",
+    "axios": "^1.13.2",
+    "date-fns": "^4.1.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.5"
+  },
   "devDependencies": {
-    "@tailwindcss/forms": "^0.5.10",
-    "autoprefixer": "^10.4.19",
-    "concurrently": "^9.2.1",
-    "live-server": "^1.2.2",
-    "npm-run-all": "^4.1.5",
-    "postcss": "^8.4.41",
-    "tailwindcss": "^3.4.13"
+    "@eslint/js": "^9.36.0",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.22",
+    "globals": "^16.4.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "vite": "npm:rolldown-vite@7.1.14"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@7.1.14"
   }
 }

@@ -18,6 +18,8 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.80.0",
     "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
