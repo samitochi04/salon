@@ -8,14 +8,22 @@
         <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-brand-500 text-lg font-semibold text-white shadow-soft">RB</span>
         <div>
           <p class="text-sm uppercase tracking-[0.35em] text-slate-500">Radiant Bloom</p>
-          <p class="text-sm font-medium text-slate-700">Body Ritual Atelier</p>
+          <p class="text-sm font-medium text-slate-700">Atelier de rituels corps</p>
         </div>
       </div>
       <nav class="hidden items-center gap-10 text-sm font-medium text-slate-600 md:flex">
-        <a class="transition hover:text-brand-600" href="#rituals">Ritual Menu</a>
-        <a class="transition hover:text-brand-600" href="#results">Clinical Proof</a>
-        <a class="transition hover:text-brand-600" href="#studio">The Studio</a>
+        <a class="transition hover:text-brand-600" href="#rituels">Rituels</a>
+        <a class="transition hover:text-brand-600" href="#resultats">Résultats</a>
+        <a class="transition hover:text-brand-600" href="#studio">Le Studio</a>
         <a class="transition hover:text-brand-600" href="#journal">Journal</a>
+        <a
+          class="transition hover:text-brand-600"
+          hx-get="/partials/admin-login.html"
+          hx-target="#app"
+          hx-swap="innerHTML"
+        >
+          Espace admin
+        </a>
       </nav>
       <div class="hidden items-center gap-3 md:flex">
         <button
@@ -24,7 +32,7 @@
           hx-target="#modal-root"
           hx-swap="innerHTML"
         >
-          View Availability
+          Voir les disponibilités
         </button>
         <button
           class="btn-primary"
@@ -32,15 +40,15 @@
           hx-target="#modal-root"
           hx-swap="innerHTML"
         >
-          Reserve a Ritual
+          Réserver un soin
         </button>
       </div>
       <button
         class="relative z-10 flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-brand-300 hover:text-brand-500 md:hidden"
         data-nav-toggle
-        aria-label="Toggle navigation"
+        aria-label="Ouvrir la navigation"
       >
-        <span class="sr-only">Open menu</span>
+        <span class="sr-only">Ouvrir le menu</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25" />
         </svg>
@@ -52,17 +60,25 @@
     >
       <div class="flex items-center justify-between">
         <span class="text-sm uppercase tracking-[0.35em] text-slate-500">Menu</span>
-        <button class="rounded-full border border-slate-200 p-2" data-nav-toggle aria-label="Close navigation">
+        <button class="rounded-full border border-slate-200 p-2" data-nav-toggle aria-label="Fermer la navigation">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
       <div class="flex flex-col gap-4">
-        <a class="font-medium" href="#rituals">Ritual Menu</a>
-        <a class="font-medium" href="#results">Clinical Proof</a>
-        <a class="font-medium" href="#studio">The Studio</a>
+        <a class="font-medium" href="#rituels">Rituels</a>
+        <a class="font-medium" href="#resultats">Résultats</a>
+        <a class="font-medium" href="#studio">Le Studio</a>
         <a class="font-medium" href="#journal">Journal</a>
+        <a
+          class="font-medium"
+          hx-get="/partials/admin-login.html"
+          hx-target="#app"
+          hx-swap="innerHTML"
+        >
+          Espace admin
+        </a>
       </div>
       <div class="mt-auto flex flex-col gap-3">
         <button
@@ -71,7 +87,7 @@
           hx-target="#modal-root"
           hx-swap="innerHTML"
         >
-          View Availability
+          Voir les disponibilités
         </button>
         <button
           class="btn-primary w-full"
@@ -79,7 +95,7 @@
           hx-target="#modal-root"
           hx-swap="innerHTML"
         >
-          Reserve a Ritual
+          Réserver un soin
         </button>
       </div>
     </div>
@@ -90,13 +106,13 @@
       <div class="relative">
         <div class="absolute inset-0 -left-20 -top-20 h-80 w-80 rounded-full bg-brand-200/60 blur-3xl"></div>
         <span class="inline-flex items-center gap-2 rounded-full bg-brand-100 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-brand-600">
-          Holistic Bodycare
+          Soin corps holistique
         </span>
         <h1 class="mt-6 font-display text-4xl leading-tight text-slate-900 sm:text-5xl lg:text-[3.2rem]">
-          Sculpted glow, curated by master estheticians.
+          Une lumière sculptée, orchestrée par des facialistes experts.
         </h1>
         <p class="mt-6 max-w-xl text-lg text-slate-600">
-          Radiant Bloom is a rituals-driven beauty salon in the heart of downtown. Our expert team blends clinical-grade actives with calming bodywork to smooth texture, refine tone, and awaken luminous confidence.
+          Radiant Bloom est un atelier de rituels situé au cœur de Paris. Notre équipe conjugue actifs cliniques et gestuelles apaisantes pour lisser le grain de peau, unifier le teint et révéler une confiance lumineuse.
         </p>
         <div class="mt-10 flex flex-wrap items-center gap-4">
           <button
@@ -105,10 +121,10 @@
             hx-target="#modal-root"
             hx-swap="innerHTML"
           >
-            Book Signature Glow
+            Réserver le rituel Signature Éclat
           </button>
-          <a href="#rituals" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition hover:text-brand-500">
-            Explore the ritual menu
+          <a href="#rituels" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition hover:text-brand-500">
+            Découvrir nos rituels
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 12h12M12 6l6 6-6 6" />
             </svg>
@@ -116,20 +132,20 @@
         </div>
         <dl class="mt-12 grid grid-cols-2 gap-8 text-sm text-slate-500 sm:grid-cols-4">
           <div>
-            <dt class="font-semibold text-slate-900">12-week clinical study</dt>
-            <dd>92% reported smoother body texture.</dd>
+            <dt class="font-semibold text-slate-900">Étude clinique 12 semaines</dt>
+            <dd>92&nbsp;% constatent une texture peau visiblement affinée.</dd>
           </div>
           <div>
-            <dt class="font-semibold text-slate-900">Dermatologist tested</dt>
-            <dd>Formulas crafted for sensitive skin.</dd>
+            <dt class="font-semibold text-slate-900">Testé par dermatologues</dt>
+            <dd>Des formules pensées pour les peaux sensibles.</dd>
           </div>
           <div>
-            <dt class="font-semibold text-slate-900">Sustainably minded</dt>
-            <dd>Low-waste rituals, planet-forward sourcing.</dd>
+            <dt class="font-semibold text-slate-900">Engagement durable</dt>
+            <dd>Rituels à faible impact et sourcing responsable.</dd>
           </div>
           <div>
-            <dt class="font-semibold text-slate-900">By appointment only</dt>
-            <dd>Dedicated therapists &amp; serene suites.</dd>
+            <dt class="font-semibold text-slate-900">Sur rendez-vous</dt>
+            <dd>Des suites privatisées et une thérapeute dédiée.</dd>
           </div>
         </dl>
       </div>
@@ -146,116 +162,119 @@
       </div>
     </section>
 
-    <section id="rituals" class="mt-28" data-fade>
+    <section id="rituels" class="mt-28" data-fade>
       <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <span class="text-xs uppercase tracking-[0.35em] text-slate-500">Ritual menu</span>
-          <h2 class="mt-2 font-display text-3xl text-slate-900 sm:text-4xl">Choose the ritual your body has been craving</h2>
+          <span class="text-xs uppercase tracking-[0.35em] text-slate-500">Carte des rituels</span>
+          <h2 class="mt-2 font-display text-3xl text-slate-900 sm:text-4xl">Choisissez le rituel dont votre corps a besoin</h2>
         </div>
-        <a href="#booking" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600">
-          Pricing &amp; availability
+        <a href="#reservation" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600">
+          Tarifs &amp; disponibilités
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </a>
       </div>
       <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <article class="card group">
-          <span class="text-xs uppercase tracking-[0.25em] text-brand-500">best seller</span>
-          <h3 class="mt-4 font-display text-2xl text-slate-900">Sculpt &amp; Illuminate</h3>
-          <p class="mt-3 text-sm text-slate-600">
-            Microcurrent contouring, lymphatic drainage, and active resurfacing to smooth, tighten, and spotlight your silhouette.
-          </p>
-          <ul class="mt-6 space-y-2 text-sm text-slate-500">
-            <li>• 75-minute full-body ritual</li>
-            <li>• Formulated with peptides + niacinamide</li>
-            <li>• Includes glow body elixir take-home</li>
-          </ul>
-          <button
-            class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition group-hover:gap-3"
-            hx-get="/partials/booking-modal.html"
-            hx-target="#modal-root"
-            hx-swap="innerHTML"
-          >
-            Reserve this ritual
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 12h12M12 6l6 6-6 6" />
-            </svg>
-          </button>
-        </article>
-        <article class="card group">
-          <span class="text-xs uppercase tracking-[0.25em] text-brand-500">new</span>
-          <h3 class="mt-4 font-display text-2xl text-slate-900">Barrier Restore Polish</h3>
-          <p class="mt-3 text-sm text-slate-600">
-            Our sensorial polish pairs gentle enzymes with ceramide-rich hydration to reveal plush, velvety skin in one session.
-          </p>
-          <ul class="mt-6 space-y-2 text-sm text-slate-500">
-            <li>• 60-minute retexturizing glow</li>
-            <li>• Botanical micro-exfoliants</li>
-            <li>• Hypoallergenic + pregnancy safe</li>
-          </ul>
-          <button
-            class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition group-hover:gap-3"
-            hx-get="/partials/booking-modal.html"
-            hx-target="#modal-root"
-            hx-swap="innerHTML"
-          >
-            Book a polish
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 12h12M12 6l6 6-6 6" />
-            </svg>
-          </button>
-        </article>
-        <article class="card group">
-          <span class="text-xs uppercase tracking-[0.25em] text-brand-500">studio exclusive</span>
-          <h3 class="mt-4 font-display text-2xl text-slate-900">Luminous Prenatal Reset</h3>
-          <p class="mt-3 text-sm text-slate-600">
-            A cocooning ritual featuring gentle compression, mineral mists, and fascia release to soothe tired limbs and lift spirits.
-          </p>
-          <ul class="mt-6 space-y-2 text-sm text-slate-500">
-            <li>• 80-minute prenatal indulgence</li>
-            <li>• Custom bolster system for comfort</li>
-            <li>• Includes herbal belly balm</li>
-          </ul>
-          <button
-            class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition group-hover:gap-3"
-            hx-get="/partials/booking-modal.html"
-            hx-target="#modal-root"
-            hx-swap="innerHTML"
-          >
-            Plan your visit
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 12h12M12 6l6 6-6 6" />
-            </svg>
-          </button>
-        </article>
+        <div data-service-card-list class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- Contenu de secours pour utilisateurs sans JavaScript -->
+          <article class="card group">
+            <span class="text-xs uppercase tracking-[0.25em] text-brand-500">best-seller</span>
+            <h3 class="mt-4 font-display text-2xl text-slate-900">Sculpt &amp; Glow</h3>
+            <p class="mt-3 text-sm text-slate-600">
+              Remodelage par micro-courants, drainage et actifs resurfaçants pour sublimer votre silhouette.
+            </p>
+            <ul class="mt-6 space-y-2 text-sm text-slate-500">
+              <li>• Rituel corps complet de 75 minutes</li>
+              <li>• Complexe peptides &amp; niacinamide</li>
+              <li>• Élixir éclat offert pour prolonger à domicile</li>
+            </ul>
+            <button
+              class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition group-hover:gap-3"
+              hx-get="/partials/booking-modal.html"
+              hx-target="#modal-root"
+              hx-swap="innerHTML"
+            >
+              Réserver
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 12h12M12 6l6 6-6 6" />
+              </svg>
+            </button>
+          </article>
+          <article class="card group">
+            <span class="text-xs uppercase tracking-[0.25em] text-brand-500">nouveauté</span>
+            <h3 class="mt-4 font-display text-2xl text-slate-900">Polish Barrière Sublime</h3>
+            <p class="mt-3 text-sm text-slate-600">
+              Enzymes douces et céramides régénérants pour révéler une peau veloutée en une séance.
+            </p>
+            <ul class="mt-6 space-y-2 text-sm text-slate-500">
+              <li>• 60 minutes de resurfacing délicat</li>
+              <li>• Micro-exfoliation botanique</li>
+              <li>• Compatible grossesse &amp; peaux réactives</li>
+            </ul>
+            <button
+              class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition group-hover:gap-3"
+              hx-get="/partials/booking-modal.html"
+              hx-target="#modal-root"
+              hx-swap="innerHTML"
+            >
+              Réserver
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 12h12M12 6l6 6-6 6" />
+              </svg>
+            </button>
+          </article>
+          <article class="card group">
+            <span class="text-xs uppercase tracking-[0.25em] text-brand-500">exclusif studio</span>
+            <h3 class="mt-4 font-display text-2xl text-slate-900">Reset Prénatal Lumineux</h3>
+            <p class="mt-3 text-sm text-slate-600">
+              Enveloppement cocooning, brumes minérales et relâchement fascial pour apaiser le corps et l’esprit.
+            </p>
+            <ul class="mt-6 space-y-2 text-sm text-slate-500">
+              <li>• 80 minutes de bien-être sur mesure</li>
+              <li>• Système de coussins modulables pour un confort total</li>
+              <li>• Baume ventre à base de plantes offert</li>
+            </ul>
+            <button
+              class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition group-hover:gap-3"
+              hx-get="/partials/booking-modal.html"
+              hx-target="#modal-root"
+              hx-swap="innerHTML"
+            >
+              Planifier une visite
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 12h12M12 6l6 6-6 6" />
+              </svg>
+            </button>
+          </article>
+        </div>
       </div>
     </section>
 
-    <section id="results" class="mt-28 rounded-[2.75rem] bg-gradient-to-br from-brand-600 via-brand-500 to-brand-400 px-8 py-14 text-white md:px-14" data-fade>
+    <section id="resultats" class="mt-28 rounded-[2.75rem] bg-gradient-to-br from-brand-600 via-brand-500 to-brand-400 px-8 py-14 text-white md:px-14" data-fade>
       <div class="grid gap-12 md:grid-cols-2 md:items-center">
         <div>
-          <span class="text-xs uppercase tracking-[0.45em] text-white/70">Clinical Proof</span>
-          <h2 class="mt-3 font-display text-3xl leading-snug text-white">Advanced actives, verified by lab-backed data.</h2>
+          <span class="text-xs uppercase tracking-[0.45em] text-white/70">Résultats prouvés</span>
+          <h2 class="mt-3 font-display text-3xl leading-snug text-white">Des actifs pointus, validés par la recherche laboratoire.</h2>
           <p class="mt-5 max-w-lg text-base text-white/80">
-            Every protocol is meticulously tested to deliver luminous results without compromising the health of your barrier. From peptides to encapsulated retinol, we adapt actives to your skin’s story.
+            Chaque protocole est testé avec précision pour offrir de l’éclat sans compromettre la barrière cutanée. Peptides, rétinol encapsulé ou complexes minéraux sont ajustés en fonction de l’histoire de votre peau.
           </p>
           <dl class="mt-10 grid gap-6 text-sm text-white/80 sm:grid-cols-2">
             <div>
-              <dt class="text-4xl font-bold text-white">94%</dt>
-              <dd>Experience improved tone and clarity after two sessions.</dd>
+              <dt class="text-4xl font-bold text-white">94&nbsp;%</dt>
+              <dd>Constatent un teint plus uniforme après deux séances.</dd>
             </div>
             <div>
-              <dt class="text-4xl font-bold text-white">88%</dt>
-              <dd>Report visibly plumper, more hydrated skin within 48 hours.</dd>
+              <dt class="text-4xl font-bold text-white">88&nbsp;%</dt>
+              <dd>Retrouvent une peau repulpée et profondément hydratée sous 48&nbsp;h.</dd>
             </div>
             <div>
-              <dt class="text-4xl font-bold text-white">100%</dt>
-              <dd>Enjoy bespoke take-home routines curated by our facialists.</dd>
+              <dt class="text-4xl font-bold text-white">100&nbsp;%</dt>
+              <dd>Reçoivent un programme maison personnalisé.</dd>
             </div>
             <div>
-              <dt class="text-4xl font-bold text-white">72%</dt>
-              <dd>Notice refined body contours and smoother texture at week 6.</dd>
+              <dt class="text-4xl font-bold text-white">72&nbsp;%</dt>
+              <dd>Observant des courbes affinées et une peau lissée dès la 6ᵉ semaine.</dd>
             </div>
           </dl>
         </div>
@@ -270,14 +289,14 @@
                   </svg>
                 </span>
                 <div>
-                  <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Ingredient stories</p>
-                  <h3 class="font-display text-xl text-slate-900">Firming Body Serum</h3>
+                  <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Focus ingrédient</p>
+                  <h3 class="font-display text-xl text-slate-900">Sérum Corps Fermeté</h3>
                 </div>
               </div>
               <ul class="mt-6 space-y-3 text-sm text-slate-600">
-                <li>• Encapsulated retinol for gentle overnight renewal.</li>
-                <li>• Tri-peptide complex to support collagen + elasticity.</li>
-                <li>• Dew-supporting humectants for lasting hydration.</li>
+                <li>• Rétinol encapsulé pour une régénération douce nocturne.</li>
+                <li>• Complexe tri-peptides pour soutenir collagène et élasticité.</li>
+                <li>• Humectants longue durée pour une hydratation éclat.</li>
               </ul>
               <button
                 class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-600"
@@ -285,7 +304,7 @@
                 hx-target="#modal-root"
                 hx-swap="innerHTML"
               >
-                Pair with a ritual
+                Associer à un rituel
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 12h12M12 6l6 6-6 6" />
                 </svg>
@@ -306,28 +325,28 @@
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent"></div>
         <div class="absolute bottom-6 left-6 right-6 rounded-3xl bg-white/80 p-6 backdrop-blur">
-          <p class="text-xs uppercase tracking-[0.35em] text-slate-500">The studio</p>
+          <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Le studio</p>
           <p class="mt-2 text-lg font-semibold text-slate-800">
-            Tailored suites with chromotherapy, curated playlists, and aromatherapy designed to cocoon your senses.
+            Suites privées, chromothérapie, playlists immersives et aromathérapie composent un cocon multisensoriel.
           </p>
         </div>
       </div>
       <div class="space-y-8">
         <div>
-          <span class="text-xs uppercase tracking-[0.45em] text-slate-500">Experience</span>
-          <h2 class="mt-2 font-display text-3xl text-slate-900 sm:text-4xl">Sensory design that sets the tone for transformation.</h2>
+          <span class="text-xs uppercase tracking-[0.45em] text-slate-500">Expérience</span>
+          <h2 class="mt-2 font-display text-3xl text-slate-900 sm:text-4xl">Une scénographie sensorielle pour initier la métamorphose.</h2>
         </div>
         <p class="text-base text-slate-600">
-          Our philosophy is rooted in ritual. Every touchpoint is choreographed—signature teas on arrival, guided breathing, sensorial product layering, and curated homecare to extend your glow. We accommodate custom requests and inclusive bodycare.
+          Notre philosophie est celle du rituel : infusion de bienvenue, respiration guidée, superposition sensorielle de textures et prescription maison prolongent l’éclat. Nous accueillons chaque demande personnalisée et toutes les morphologies.
         </p>
         <div class="grid gap-6 sm:grid-cols-2">
           <div class="rounded-3xl border border-slate-200 bg-white/80 p-6">
-            <p class="text-sm font-semibold text-brand-600">Tailored Enhancements</p>
-            <p class="mt-2 text-sm text-slate-600">Add-on LED therapy, cryo toning, or gua sha sculpting to every ritual.</p>
+            <p class="text-sm font-semibold text-brand-600">Boosters sur mesure</p>
+            <p class="mt-2 text-sm text-slate-600">Ajoutez LED, cryo-toning ou gua sha sculptant à chaque rituel.</p>
           </div>
           <div class="rounded-3xl border border-slate-200 bg-white/80 p-6">
-            <p class="text-sm font-semibold text-brand-600">Conscious Selection</p>
-            <p class="mt-2 text-sm text-slate-600">Vegan, cruelty-free, and dermatologist tested formulas that respect your barrier.</p>
+            <p class="text-sm font-semibold text-brand-600">Sélection consciente</p>
+            <p class="mt-2 text-sm text-slate-600">Formules vegan, cruelty-free et testées dermatologiquement pour respecter la barrière cutanée.</p>
           </div>
         </div>
         <div class="flex flex-wrap items-center gap-6">
@@ -336,7 +355,7 @@
             <img class="h-11 w-11 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1600180758891-9cb0d6f10c7f?auto=format&fit=crop&w=240&q=80" alt="Client" loading="lazy" />
             <img class="h-11 w-11 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=240&q=80" alt="Client" loading="lazy" />
           </div>
-          <p class="text-sm text-slate-500">“A visit to Radiant Bloom is the highlight of my month.”</p>
+          <p class="text-sm text-slate-500">«&nbsp;Une visite chez Radiant Bloom illumine littéralement mon mois.&nbsp;»</p>
         </div>
         <button
           class="btn-primary"
@@ -344,7 +363,7 @@
           hx-target="#modal-root"
           hx-swap="innerHTML"
         >
-          Schedule studio tour
+          Visiter le studio
         </button>
       </div>
     </section>
@@ -353,10 +372,10 @@
       <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
           <span class="text-xs uppercase tracking-[0.35em] text-slate-500">Journal</span>
-          <h2 class="mt-2 font-display text-3xl text-slate-900 sm:text-4xl">Glow cues from the Radiant Bloom collective</h2>
+          <h2 class="mt-2 font-display text-3xl text-slate-900 sm:text-4xl">Les notes du collectif Radiant Bloom</h2>
         </div>
         <a href="#" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600">
-          See all features
+          Voir tous les articles
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M12 5l7 7-7 7" />
           </svg>
@@ -367,36 +386,36 @@
           <div class="relative overflow-hidden rounded-3xl">
             <img src="https://images.unsplash.com/photo-1542831371-d531d36971e6?auto=format&fit=crop&w=800&q=80" alt="Clinical lab" class="h-44 w-full object-cover" loading="lazy" />
           </div>
-          <p class="mt-6 text-xs uppercase tracking-[0.25em] text-brand-600">Clinical insight</p>
-          <h3 class="mt-2 text-lg font-semibold text-slate-900">Why body actives deserve the same spotlight as facial care</h3>
-          <p class="mt-3 text-sm text-slate-600">Our lead esthetician shares the science behind peptides, retinol, and barrier-supporting ceramides below the neckline.</p>
+          <p class="mt-6 text-xs uppercase tracking-[0.25em] text-brand-600">Insight clinique</p>
+          <h3 class="mt-2 text-lg font-semibold text-slate-900">Pourquoi les actifs corps méritent la même lumière que le visage</h3>
+          <p class="mt-3 text-sm text-slate-600">Notre facialiste en chef dévoile la science des peptides, du rétinol et des céramides protecteurs appliqués au corps.</p>
         </article>
         <article class="rounded-[2rem] border border-white/60 bg-white/80 p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
           <div class="relative overflow-hidden rounded-3xl">
             <img src="https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?auto=format&fit=crop&w=800&q=80" alt="Treatment oils" class="h-44 w-full object-cover" loading="lazy" />
           </div>
-          <p class="mt-6 text-xs uppercase tracking-[0.25em] text-brand-600">Behind the formula</p>
-          <h3 class="mt-2 text-lg font-semibold text-slate-900">Inside our dew-restoring body elixir</h3>
-          <p class="mt-3 text-sm text-slate-600">A breakdown of our hero ingredients and how to layer them for head-to-toe radiance.</p>
+          <p class="mt-6 text-xs uppercase tracking-[0.25em] text-brand-600">Dans la formule</p>
+          <h3 class="mt-2 text-lg font-semibold text-slate-900">Les secrets de notre élixir corps rosée</h3>
+          <p class="mt-3 text-sm text-slate-600">Analyse des ingrédients phares et guide d’application pour un éclat intégral.</p>
         </article>
         <article class="rounded-[2rem] border border-white/60 bg-white/80 p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
           <div class="relative overflow-hidden rounded-3xl">
             <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=800&q=80" alt="Salon team" class="h-44 w-full object-cover" loading="lazy" />
           </div>
-          <p class="mt-6 text-xs uppercase tracking-[0.25em] text-brand-600">Team spotlight</p>
-          <h3 class="mt-2 text-lg font-semibold text-slate-900">Meet our Glow Collective</h3>
-          <p class="mt-3 text-sm text-slate-600">Get to know the practitioners and discover their signature touch.</p>
+          <p class="mt-6 text-xs uppercase tracking-[0.25em] text-brand-600">Portrait d’équipe</p>
+          <h3 class="mt-2 text-lg font-semibold text-slate-900">Rencontrez le collectif Glow</h3>
+          <p class="mt-3 text-sm text-slate-600">Apprenez à connaître nos praticiennes et leurs gestes signature.</p>
         </article>
       </div>
     </section>
 
-    <section id="booking" class="mt-28 rounded-[2.5rem] border border-white/70 bg-white/85 px-8 py-14 text-slate-900 shadow-2xl md:px-16" data-fade>
+    <section id="reservation" class="mt-28 rounded-[2.5rem] border border-white/70 bg-white/85 px-8 py-14 text-slate-900 shadow-2xl md:px-16" data-fade>
       <div class="grid gap-10 md:grid-cols-[1.2fr_1fr] md:items-center">
         <div>
-          <span class="text-xs uppercase tracking-[0.45em] text-brand-500">Glowing appointments</span>
-          <h2 class="mt-4 font-display text-3xl text-slate-900 sm:text-4xl">Reserve your Radiant Bloom ritual.</h2>
+          <span class="text-xs uppercase tracking-[0.45em] text-brand-500">Réservations lumineuses</span>
+          <h2 class="mt-4 font-display text-3xl text-slate-900 sm:text-4xl">Réservez votre rituel Radiant Bloom.</h2>
           <p class="mt-4 max-w-xl text-base text-slate-600">
-            We release openings six weeks in advance. Select your date, confirm the ritual, and we’ll send a curated prep guide so you arrive grounded and glowing.
+            Les créneaux sont ouverts six semaines à l’avance. Sélectionnez votre date, choisissez le rituel et recevez notre guide de préparation personnalisé.
           </p>
           <div class="mt-8 flex flex-wrap items-center gap-4">
             <button
@@ -405,31 +424,31 @@
               hx-target="#modal-root"
               hx-swap="innerHTML"
             >
-              Open booking calendar
+              Ouvrir le calendrier
             </button>
-            <p class="text-sm text-slate-500">Prefer to phone? Call us at <a class="text-brand-600" href="tel:+12025550123">(202) 555-0123</a>.</p>
+            <p class="text-sm text-slate-500">Besoin de nous appeler ? <a class="text-brand-600" href="tel:+33184251122">+33 1 84 25 11 22</a>.</p>
           </div>
           <div class="mt-10 grid gap-6 sm:grid-cols-2">
             <div class="rounded-3xl bg-brand-50 p-6">
-              <p class="text-sm font-semibold text-brand-600">Fine-tuned reminders</p>
-              <p class="mt-2 text-sm text-brand-700">Receive SMS + email guidance 48 hours prior to your ritual.</p>
+              <p class="text-sm font-semibold text-brand-600">Rappels ajustés</p>
+              <p class="mt-2 text-sm text-brand-700">SMS et e-mail de préparation 48&nbsp;heures avant votre rituel.</p>
             </div>
             <div class="rounded-3xl bg-brand-50 p-6">
-              <p class="text-sm font-semibold text-brand-600">Admin portal</p>
-              <p class="mt-2 text-sm text-brand-700">Our team manages bookings live from the dashboard for quick adjustments.</p>
+              <p class="text-sm font-semibold text-brand-600">Portail concierge</p>
+              <p class="mt-2 text-sm text-brand-700">L’équipe suit vos demandes en temps réel pour ajuster vos séances.</p>
             </div>
           </div>
         </div>
         <div class="rounded-[2rem] bg-gradient-to-br from-white via-brand-50 to-white p-6 shadow-[0_30px_80px_-50px_rgba(210,50,120,0.6)]">
-          <p class="text-sm font-semibold uppercase tracking-[0.3em] text-brand-500">This week’s focus</p>
+          <p class="text-sm font-semibold uppercase tracking-[0.3em] text-brand-500">Focus de la semaine</p>
           <p class="mt-4 text-2xl font-semibold text-slate-900">Glow Body Buff</p>
           <p class="mt-3 text-sm text-slate-600">
-            60-minute resurfacing featuring triple-acid polish, oxygen misting, and barrier-restoring mask. Pairs beautifully with our Body Serum Mist take-home.
+            60 minutes de resurfaçage associant triple acide, brume oxygénante et masque réparateur de barrière. Idéal avec notre brume-sérum corps à emporter.
           </p>
           <ul class="mt-6 space-y-3 text-sm text-slate-500">
-            <li>• Recommended every 4 weeks for lasting results.</li>
-            <li>• Works for treating texture, dullness, or uneven body tone.</li>
-            <li>• Exclusive retail kit available post-ritual.</li>
+            <li>• Recommandé toutes les 4 semaines pour des résultats durables.</li>
+            <li>• Cible texture irrégulière, manque d’éclat et teint hétérogène.</li>
+            <li>• Coffret maison exclusif disponible après le rituel.</li>
           </ul>
         </div>
       </div>
@@ -440,26 +459,26 @@
     <div class="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-4 md:px-10">
       <div class="space-y-4">
         <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-brand-500 text-lg font-semibold text-white shadow-soft">RB</span>
-        <p class="text-sm text-slate-500">Radiant Bloom is a bodycare salon crafting glow-forward rituals backed by clinical-grade actives and compassionate touch.</p>
+        <p class="text-sm text-slate-500">Radiant Bloom est un salon dédié au corps qui imagine des rituels lumière mêlant actifs cliniques et toucher bienveillant.</p>
       </div>
       <div>
-        <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Visit</p>
+        <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Nous trouver</p>
         <ul class="mt-4 space-y-2 text-sm text-slate-600">
-          <li>1430 Bloom Street, Suite 4A</li>
-          <li>Washington, DC</li>
-          <li><a class="text-brand-600" href="tel:+12025550123">(202) 555-0123</a></li>
+          <li>14 rue du Regard, 4ᵉ étage</li>
+          <li>75006 Paris</li>
+          <li><a class="text-brand-600" href="tel:+33184251122">+33 1 84 25 11 22</a></li>
         </ul>
       </div>
       <div>
         <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Studio</p>
         <ul class="mt-4 space-y-2 text-sm text-slate-600">
-          <li><a class="transition hover:text-brand-600" href="#rituals">Ritual Menu</a></li>
-          <li><a class="transition hover:text-brand-600" href="#results">Clinical Proof</a></li>
-          <li><a class="transition hover:text-brand-600" href="#booking">Book Now</a></li>
+          <li><a class="transition hover:text-brand-600" href="#rituels">Carte des rituels</a></li>
+          <li><a class="transition hover:text-brand-600" href="#resultats">Résultats</a></li>
+          <li><a class="transition hover:text-brand-600" href="#reservation">Réserver</a></li>
         </ul>
       </div>
       <div>
-        <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Follow</p>
+        <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Suivez-nous</p>
         <div class="mt-4 flex gap-3">
           <a class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-brand-300 hover:text-brand-600" href="#" aria-label="Instagram">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -475,7 +494,7 @@
       </div>
     </div>
     <div class="border-t border-white/60 py-6">
-      <p class="text-center text-xs text-slate-500">© <span data-current-year></span> Radiant Bloom Salon. Crafted for luminous bodies.</p>
+      <p class="text-center text-xs text-slate-500">© <span data-current-year></span> Radiant Bloom. Conçu pour des corps lumineux.</p>
     </div>
   </footer>
 </div>

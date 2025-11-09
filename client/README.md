@@ -23,6 +23,15 @@
 - `npm run dev` – watch Tailwind CSS and serve `public/` at `http://127.0.0.1:8080`
 - `npm run css:build` – produce a minified stylesheet at `public/assets/tailwind.css`
 
+## Supabase & Auth
+- Configure the public anon key in `public/index.html` via `window.__RB_CONFIG` before shipping
+- The admin espace uses Supabase email/password auth; stored tokens live in `sessionStorage`
+- HTMX requests are decorated with the Supabase access token to reach `/api/admin/**`
+
+## Newsletter Pop-up
+- A delayed newsletter modal (10s) subscribes visitors via `POST /api/public/newsletter`
+- Dismissal is persisted in `sessionStorage` to avoid repeat prompts per session
+
 ## Deployment Targets
 - Ship the contents of `public/` through Express static middleware or any static host
 - Commit generated CSS via CI/CD (or rebuild at deploy time with the same commands)

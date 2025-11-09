@@ -11,7 +11,7 @@
       class="absolute right-6 top-6 flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-brand-200 hover:text-brand-600"
       type="button"
       data-modal-dismiss
-      aria-label="Close booking modal"
+      aria-label="Fermer la fenêtre de réservation"
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
@@ -20,22 +20,22 @@
     <div class="hidden h-full flex-col justify-between bg-gradient-to-br from-brand-500 via-brand-400 to-brand-300 p-10 text-white md:flex">
       <div>
         <span class="text-xs uppercase tracking-[0.35em] text-white/70">Radiant Bloom</span>
-        <h2 class="mt-4 font-display text-3xl leading-snug text-white">Let’s lock in your luminous ritual.</h2>
+        <h2 class="mt-4 font-display text-3xl leading-snug text-white">Nous verrouillons votre rituel lumineux.</h2>
       </div>
       <div class="mt-10 space-y-4 text-sm text-white/90">
-        <p>• Clinical-grade actives layered with soothing bodywork.</p>
-        <p>• Personalized prep guide and aftercare delivered by email.</p>
-        <p>• Confirmations and reminders sent 48 hours in advance.</p>
-        <p class="mt-6 text-xs uppercase tracking-[0.35em]">Need assistance?</p>
-        <p class="text-white/90"><a class="underline decoration-white/40 hover:decoration-white" href="tel:+12025550123">(202) 555-0123</a> · <a class="underline decoration-white/40 hover:decoration-white" href="mailto:hello@radiantbloom.com">hello@radiantbloom.com</a></p>
+        <p>• Actifs cliniques associés à des gestuelles apaisantes.</p>
+        <p>• Guide de préparation personnalisé envoyé par e-mail.</p>
+        <p>• Confirmation et rappels 48&nbsp;heures avant la séance.</p>
+        <p class="mt-6 text-xs uppercase tracking-[0.35em]">Besoin d’aide&nbsp;?</p>
+        <p class="text-white/90"><a class="underline decoration-white/40 hover:decoration-white" href="tel:+33184251122">+33 1 84 25 11 22</a> · <a class="underline decoration-white/40 hover:decoration-white" href="mailto:bonjour@radiantbloom.com">bonjour@radiantbloom.com</a></p>
       </div>
     </div>
     <div class="max-h-[90vh] overflow-y-auto bg-white px-6 py-10 md:px-10">
       <form class="space-y-10" data-booking-form novalidate>
         <div class="space-y-6">
           <div>
-            <h3 class="font-display text-2xl text-slate-900">Pick your date &amp; time</h3>
-            <p class="mt-2 text-sm text-slate-500">We hold slots for up to 15 minutes once selected. Availability updates in real time.</p>
+            <h3 class="font-display text-2xl text-slate-900">Choisissez votre date &amp; votre créneau</h3>
+            <p class="mt-2 text-sm text-slate-500">Nous bloquons votre sélection pendant 15&nbsp;minutes. Les disponibilités se mettent à jour en temps réel.</p>
           </div>
           <div
             class="rounded-[1.75rem] border border-slate-200 bg-white/80 p-5 shadow-sm"
@@ -46,18 +46,18 @@
                 class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-brand-200 hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
                 type="button"
                 data-calendar-prev
-                aria-label="Previous month"
+                aria-label="Mois précédent"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <p class="text-sm font-semibold uppercase tracking-[0.35em] text-slate-500" data-calendar-month>Month</p>
+              <p class="text-sm font-semibold uppercase tracking-[0.35em] text-slate-500" data-calendar-month>Mois</p>
               <button
                 class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-brand-200 hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
                 type="button"
                 data-calendar-next
-                aria-label="Next month"
+                aria-label="Mois suivant"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
@@ -65,17 +65,17 @@
               </button>
             </div>
             <div class="mt-6 grid grid-cols-7 gap-2 text-center text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-              <span>Sun</span>
-              <span>Mon</span>
-              <span>Tue</span>
-              <span>Wed</span>
-              <span>Thu</span>
-              <span>Fri</span>
-              <span>Sat</span>
+              <span>Dim</span>
+              <span>Lun</span>
+              <span>Mar</span>
+              <span>Mer</span>
+              <span>Jeu</span>
+              <span>Ven</span>
+              <span>Sam</span>
             </div>
             <div class="mt-2 grid grid-cols-7 gap-2 text-sm text-slate-600" data-calendar-grid></div>
             <div class="mt-6 rounded-2xl bg-brand-50/70 p-4 text-sm text-brand-700" data-selection-summary>
-              Select a preferred day to reveal available slots.
+              Sélectionnez un jour pour afficher les créneaux disponibles.
             </div>
             <div class="mt-4 flex flex-wrap gap-3" data-slot-list></div>
             <input type="hidden" name="appointment_date" />
@@ -84,70 +84,67 @@
         </div>
 
         <div class="space-y-4">
-          <h3 class="font-display text-2xl text-slate-900">Tell us about you</h3>
+          <h3 class="font-display text-2xl text-slate-900">Parlez-nous de vous</h3>
           <div class="grid gap-4 md:grid-cols-2">
             <label class="space-y-2 text-sm text-slate-600">
-              Full name
+              Nom complet
               <input
                 class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200"
                 type="text"
                 name="full_name"
-                placeholder="Your name"
+                placeholder="Votre nom"
                 required
               />
             </label>
             <label class="space-y-2 text-sm text-slate-600">
-              Email address
+              Adresse e-mail
               <input
                 class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200"
                 type="email"
                 name="email"
-                placeholder="you@example.com"
+                placeholder="vous@example.com"
                 required
               />
             </label>
             <label class="space-y-2 text-sm text-slate-600">
-              Mobile number
+              Numéro de téléphone
               <input
                 class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200"
                 type="tel"
                 name="phone"
-                placeholder="+1 (202) 555-0123"
+                placeholder="+33 6 12 34 56 78"
               />
             </label>
             <label class="space-y-2 text-sm text-slate-600">
-              Ritual focus
+              Soin désiré
               <select
                 class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200"
                 name="service"
+                data-service-select
                 required
               >
-                <option value="">Select an offering…</option>
-                <option value="sculpt-illuminate">Sculpt &amp; Illuminate (75 min)</option>
-                <option value="barrier-restore">Barrier Restore Polish (60 min)</option>
-                <option value="prenatal-reset">Luminous Prenatal Reset (80 min)</option>
-                <option value="custom">Custom body ritual</option>
+                <option value="">Sélectionnez un soin…</option>
               </select>
             </label>
           </div>
           <label class="space-y-2 text-sm text-slate-600">
-            Notes for our team
+            Notes pour notre équipe
             <textarea
               class="min-h-[120px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200"
               name="notes"
-              placeholder="Share skin goals, accessibility needs, or preferred therapist."
+              placeholder="Indiquez vos objectifs peau, vos besoins d’accessibilité ou votre praticienne préférée."
             ></textarea>
           </label>
         </div>
 
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p class="text-sm text-slate-500">You’ll receive a confirmation email and SMS once we review your request.</p>
+          <p class="text-sm text-slate-500">Un e-mail et un SMS de confirmation vous seront envoyés après validation par notre concierge.</p>
           <div class="flex flex-col gap-3 sm:flex-row">
             <button type="reset" class="rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-500 transition hover:text-slate-700">
-              Cancel
+              Annuler
             </button>
             <button type="submit" class="btn-primary">
-              Submit booking request
+              Envoyer la demande
             </button>
           </div>
         </div>

@@ -2,6 +2,17 @@ const { sendEmail } = require("../config/mailer");
 const { env } = require("../config/env");
 const { logNotification } = require("../repositories/bookingRepository");
 
+const STATUS_LABELS = {
+  pending: "en attente",
+  confirmed: "confirmée",
+  completed: "effectuée",
+  cancelled: "annulée",
+};
+
+function translateStatus(status) {
+  return STATUS_LABELS[status] ?? status;
+}
+
 function formatDateTime(isoString) {
   const date = new Date(isoString);
   return date.toLocaleString(undefined, {
@@ -47,19 +58,19 @@ async function safeSend({ supabase, emailPayload, logPayload }) {
 }
 
 async function notifyCustomerBookingReceived({ supabase, booking }) {
-  const subject = "Radiant Bloom • Booking request received";
+  const subject = "Radiant Bloom • Demande de réservation reçue";
   const start = formatDateTime(booking.start_time);
   const html = `
-  <p>Hello ${booking.customer_full_name},</p>
-  <p>Thank you for choosing Radiant Bloom. Your booking request has been received and our concierge will confirm within two business hours.</p>
-  <p><strong>Reservation summary:</strong></p>
+  <p>Bonjour ${booking.customer_full_name},</p>
+  <p>Merci d’avoir choisi Radiant Bloom. Votre demande de réservation a bien été enregistrée et notre concierge vous confirmera le rendez-vous sous deux heures ouvrées.</p>
+  <p><strong>Récapitulatif :</strong></p>
   <ul>
-    <li>Ritual: ${booking.service?.name ?? "Custom ritual"}</li>
-    <li>Date &amp; time: ${start}</li>
-    <li>Confirmation code: <strong>${booking.confirmation_code}</strong></li>
+    <li>Soin : ${booking.service?.name ?? "Soin personnalisé"}</li>
+    <li>Date et heure : ${start}</li>
+    <li>Code de confirmation : <strong>${booking.confirmation_code}</strong></li>
   </ul>
-  <p>We will be in touch shortly with preparation details designed around your goals.</p>
-  <p>With gratitude,<br/>The Radiant Bloom Collective</p>
+  <p>Nous reviendrons très vite vers vous avec les conseils de préparation adaptés à vos objectifs.</p>
+  <p>Avec gratitude,<br/>L’équipe Radiant Bloom</p>
 `;
 
   return safeSend({
@@ -79,17 +90,17 @@ async function notifyCustomerBookingReceived({ supabase, booking }) {
 
 async function notifyAdminBookingReceived({ supabase, booking }) {
   if (!env.adminInbox) return null;
-  const subject = `New booking request • ${booking.customer_full_name}`;
+  const subject = `Nouvelle demande de réservation • ${booking.customer_full_name}`;
   const html = `
-  <p>New booking submitted.</p>
+  <p>Une nouvelle demande de réservation vient d’être reçue.</p>
   <ul>
-    <li><strong>Client:</strong> ${booking.customer_full_name} (${booking.customer_email})</li>
-    <li><strong>Service:</strong> ${booking.service?.name ?? booking.service_id}</li>
-    <li><strong>Date:</strong> ${formatDateTime(booking.start_time)}</li>
-    <li><strong>Confirmation code:</strong> ${booking.confirmation_code}</li>
-    <li><strong>Status:</strong> ${booking.status}</li>
+    <li><strong>Client :</strong> ${booking.customer_full_name} (${booking.customer_email})</li>
+    <li><strong>Soin :</strong> ${booking.service?.name ?? booking.service_id}</li>
+    <li><strong>Date :</strong> ${formatDateTime(booking.start_time)}</li>
+    <li><strong>Code :</strong> ${booking.confirmation_code}</li>
+    <li><strong>Statut :</strong> ${translateStatus(booking.status)}</li>
   </ul>
-  ${booking.customer_notes ? `<p><strong>Client notes:</strong><br/>${booking.customer_notes}</p>` : ""}
+  ${booking.customer_notes ? `<p><strong>Notes client :</strong><br/>${booking.customer_notes}</p>` : ""}
 `;
 
   return safeSend({
@@ -108,14 +119,14 @@ async function notifyAdminBookingReceived({ supabase, booking }) {
 }
 
 async function notifyCustomerStatusUpdate({ supabase, booking }) {
-  const subject = `Radiant Bloom • Booking ${booking.status}`;
+  const subject = `Radiant Bloom • Statut de réservation : ${translateStatus(booking.status)}`;
   const html = `
-  <p>Hello ${booking.customer_full_name},</p>
-  <p>Your booking <strong>${booking.confirmation_code}</strong> has been marked as <strong>${booking.status}</strong>.</p>
-  <p>Date &amp; time: ${formatDateTime(booking.start_time)}<br/>
-  Ritual: ${booking.service?.name ?? "Custom ritual"}</p>
-  <p>If you have any questions, reply to this email or contact us at ${env.adminInbox}.</p>
-  <p>Warmly,<br/>Radiant Bloom</p>
+  <p>Bonjour ${booking.customer_full_name},</p>
+  <p>Votre réservation <strong>${booking.confirmation_code}</strong> est désormais marquée comme <strong>${translateStatus(booking.status)}</strong>.</p>
+  <p>Date &amp; heure : ${formatDateTime(booking.start_time)}<br/>
+  Soin : ${booking.service?.name ?? "Soin personnalisé"}</p>
+  <p>Pour toute question, il vous suffit de répondre à ce message ou de nous écrire à ${env.adminInbox}.</p>
+  <p>À très vite,<br/>Radiant Bloom</p>
 `;
 
   return safeSend({
@@ -133,9 +144,33 @@ async function notifyCustomerStatusUpdate({ supabase, booking }) {
   });
 }
 
+async function notifyAdminNewsletterSignup({ supabase, email }) {
+  if (!env.adminInbox) return null;
+  const subject = "Nouvelle inscription à la newsletter";
+  const html = `
+  <p>Une nouvelle adresse vient de s’inscrire à la newsletter Radiant Bloom :</p>
+  <p><strong>${email}</strong></p>
+  `;
+
+  return safeSend({
+    supabase,
+    emailPayload: {
+      to: env.adminInbox,
+      subject,
+      html,
+    },
+    logPayload: {
+      event_type: "newsletter_signup",
+      recipient: email,
+    },
+  });
+}
+
 module.exports = {
   notifyCustomerBookingReceived,
   notifyAdminBookingReceived,
   notifyCustomerStatusUpdate,
+  notifyAdminNewsletterSignup,
+  translateStatus,
 };
 

@@ -3,6 +3,73 @@ const MAX_MONTH_OFFSET = 5;
 
 const calendarState = new WeakMap();
 
+function getRadiantState() {
+  if (!window.RadiantData) {
+    window.RadiantData = { services: [], dictionary: {} };
+  }
+  return window.RadiantData;
+}
+
+function getServiceDictionary() {
+  return getRadiantState().dictionary || {};
+}
+
+function fallbackServicesFromDictionary() {
+  const dictionary = getServiceDictionary();
+  return Object.entries(dictionary).map(([slug, info]) => ({
+    slug,
+    name: info.title ?? info.name ?? slug,
+    duration_minutes: info.duration ?? null,
+  }));
+}
+
+function ensureCustomService(list) {
+  const dictionary = getServiceDictionary();
+  const customInfo = dictionary.custom || { title: "Soin sur-mesure", duration: null };
+  const hasCustom = list.some((service) => service.slug === "custom");
+  if (!hasCustom) {
+    return [
+      ...list,
+      {
+        slug: "custom",
+        name: customInfo.title ?? "Soin sur-mesure",
+        duration_minutes: customInfo.duration ?? null,
+      },
+    ];
+  }
+  return list;
+}
+
+function getServicesData() {
+  const state = getRadiantState();
+  const list =
+    state.services && state.services.length > 0 ? state.services : fallbackServicesFromDictionary();
+  return ensureCustomService(list);
+}
+
+function serviceDisplayLabel(service) {
+  const dictionary = getServiceDictionary();
+  const info = dictionary[service.slug] || {};
+  const baseName = info.title ?? service.name ?? service.slug;
+  const duration = service.duration_minutes ?? info.duration;
+  if (duration) {
+    return `${baseName} (${duration} min)`;
+  }
+  return baseName;
+}
+
+function populateServiceSelect(select) {
+  if (!select) return;
+  const services = getServicesData();
+  select.innerHTML = '<option value="">Sélectionnez un soin…</option>';
+  services.forEach((service) => {
+    const option = document.createElement("option");
+    option.value = service.slug;
+    option.textContent = serviceDisplayLabel(service);
+    select.appendChild(option);
+  });
+}
+
 function formatDateLabel(date) {
   return date.toLocaleDateString(undefined, {
     weekday: "long",
@@ -137,15 +204,15 @@ function renderSlots(container) {
   slotWrap.innerHTML = "";
 
   if (!state.selectedDate) {
-    summary.textContent = "Select a preferred day to reveal available slots.";
+    summary.textContent = "Choisissez un jour pour afficher les horaires disponibles.";
     dateInput.value = "";
     timeInput.value = "";
     return;
   }
 
-  summary.textContent = `Great choice — we’ve reserved ${formatDateLabel(
+  summary.textContent = `Créneau sélectionné pour le ${formatDateLabel(
     state.selectedDate,
-  )}. Pick a time below.`;
+  )}. Choisissez l'horaire qui vous convient.`;
   dateInput.value = formatDateValue(state.selectedDate);
 
   SLOT_OPTIONS.forEach((slot) => {
@@ -174,6 +241,8 @@ function attachFormHandlers(modal) {
   if (!form || form.dataset.bound === "true") return;
   form.dataset.bound = "true";
 
+  populateServiceSelect(form.querySelector('[name="service"]'));
+
   const responseTarget = modal.querySelector("[data-booking-response]");
   const dismiss = () => {
     const root = document.getElementById("modal-root");
@@ -198,7 +267,7 @@ function attachFormHandlers(modal) {
     if (!state?.selectedDate || !state?.selectedSlot) {
       event.preventDefault();
       responseTarget.innerHTML =
-        '<p class="rounded-xl bg-rose-50 p-4 text-sm font-semibold text-rose-500">Choose both a date and a time slot to continue.</p>';
+        '<p class="rounded-xl bg-rose-50 p-4 text-sm font-semibold text-rose-500">Merci de sélectionner une date et un horaire avant de confirmer.</p>';
       return;
     }
 
@@ -219,7 +288,7 @@ function attachFormHandlers(modal) {
       }
 
       const message = await resp.json();
-      responseTarget.innerHTML = `<p class="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-700"><strong>Booked!</strong> ${message?.message ?? "We’ll be in touch shortly."}</p>`;
+      responseTarget.innerHTML = `<p class="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-700"><strong>Réservation envoyée !</strong> ${message?.message ?? "Nous revenons vers vous très prochainement."}</p>`;
       setTimeout(dismiss, 1600);
     } catch (error) {
       try {
@@ -228,9 +297,9 @@ function attachFormHandlers(modal) {
         setTimeout(dismiss, 1800);
       } catch (fallbackError) {
         responseTarget.innerHTML =
-          '<p class="rounded-xl bg-rose-50 p-4 text-sm font-semibold text-rose-500">Something went wrong. Please try again in a moment.</p>';
+          '<p class="rounded-xl bg-rose-50 p-4 text-sm font-semibold text-rose-500">Une erreur est survenue. Merci de réessayer dans quelques instants.</p>';
         // eslint-disable-next-line no-console
-        console.error("Booking submission failed", fallbackError);
+        console.error("Échec de l’envoi de la réservation", fallbackError);
       }
     }
   });
@@ -238,7 +307,7 @@ function attachFormHandlers(modal) {
 
 function ResponseTargetAnimation(target) {
   target.innerHTML =
-    '<div class="flex items-center gap-3 rounded-xl bg-white/70 p-4 text-sm text-slate-600 shadow-sm backdrop-blur"><div class="h-5 w-5 animate-spin rounded-full border-[3px] border-brand-200 border-t-brand-500"></div><span>Locking in your ritual…</span></div>';
+    '<div class="flex items-center gap-3 rounded-xl bg-white/70 p-4 text-sm text-slate-600 shadow-sm backdrop-blur"><div class="h-5 w-5 animate-spin rounded-full border-[3px] border-brand-200 border-t-brand-500"></div><span>Nous verrouillons votre rituel…</span></div>';
 }
 
 function initCalendar(container) {
@@ -301,5 +370,11 @@ document.addEventListener("htmx:afterSwap", (event) => {
   }
   attachFormHandlers(root);
   document.body.classList.add("overflow-hidden");
+});
+
+document.addEventListener("radiant:services-ready", () => {
+  const modal = document.querySelector("[data-booking-modal]");
+  if (!modal) return;
+  populateServiceSelect(modal.querySelector('[name="service"]'));
 });
 

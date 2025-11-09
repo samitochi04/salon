@@ -1,11 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Radiant Bloom Salon</title>
+    <title>Radiant Bloom Atelier</title>
+    <meta name="description" content="Radiant Bloom, atelier de rituels corps haute performance à Paris. Réservez vos soins lumineux et accédez à l’espace concierge." />
     <link rel="stylesheet" href="/assets/tailwind.css" />
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js" integrity="sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.4/dist/umd/supabase.js"></script>
+    <script>
+      window.__RB_CONFIG = {
+        supabaseUrl: "https://rcveuejanebhfnsxbazn.supabase.co",
+        supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjdmV1ZWphbmViaGZuc3hiYXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2MDE0MzQsImV4cCI6MjA3ODE3NzQzNH0.sdvp7Wfsva4FhgyixFPQ3ztAi836bjse8i5Fq0bCLC4",
+        apiBase: "http://localhost:4000",
+      };
+    </script>
   </head>
   <body class="bg-gradient-to-br from-brand-50 via-white to-rose-100 text-slate-800 antialiased">
     <div
@@ -23,5 +32,6 @@
     <div id="modal-root"></div>
     <script type="module" src="/scripts/bootstrap.js"></script>
     <script type="module" src="/scripts/booking.js"></script>
+    <script type="module" src="/scripts/admin.js"></script>
   </body>
 </html>
