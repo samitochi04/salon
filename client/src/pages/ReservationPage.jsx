@@ -210,13 +210,20 @@ export function ReservationPage() {
         {availabilityQuery.isLoading && (
           <p className="text-sm text-slate-600">Recherche des créneaux disponibles…</p>
         )}
-        {!availabilityQuery.isLoading && availableDates.length === 0 && (
-          <p className="rounded-3xl bg-white/70 p-6 text-sm text-slate-600">
-            Aucun créneau n’est disponible sur les trois prochaines semaines. Contactez notre concierge pour une
-            disponibilité sur mesure.
+        {availabilityQuery.isError && (
+          <p className="rounded-3xl bg-rb-pink/20 p-6 text-sm text-rb-pink">
+            {availabilityQuery.error?.message ?? 'Impossible de charger les disponibilités. Veuillez réessayer dans quelques instants.'}
           </p>
         )}
-        {calendarWeeks.length > 0 && (
+        {!availabilityQuery.isLoading &&
+          !availabilityQuery.isError &&
+          availableDates.length === 0 && (
+            <p className="rounded-3xl bg-white/70 p-6 text-sm text-slate-600">
+              Aucun créneau n’est disponible sur les trois prochaines semaines. Contactez notre concierge pour une
+              disponibilité sur mesure.
+            </p>
+          )}
+        {!availabilityQuery.isError && calendarWeeks.length > 0 && (
           <div className="rounded-3xl bg-white/80 p-6 shadow-soft">
             <div className="grid grid-cols-7 gap-2 text-center text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
               {WEEKDAY_LABELS.map((label) => (
@@ -263,7 +270,7 @@ export function ReservationPage() {
           </div>
         )}
 
-        {selectedDateKey && (
+        {!availabilityQuery.isError && selectedDateKey && (
           <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
               Créneaux pour {format(parseISO(selectedDateKey), 'EEEE d MMMM', { locale: fr })}

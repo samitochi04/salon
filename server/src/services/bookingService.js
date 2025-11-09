@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const { z } = require("zod");
 const { format } = require("date-fns");
-const { zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
+const { fromZonedTime, toZonedTime } = require("date-fns-tz");
 const {
   listActiveServices,
   getServiceBySlug,
@@ -88,7 +88,7 @@ function startOfDay(date) {
 }
 
 function formatDateKey(date, timeZone = DEFAULT_OPERATING_SETTINGS.timezone) {
-  const zoned = utcToZonedTime(date, timeZone);
+  const zoned = toZonedTime(date, timeZone);
   return format(zoned, "yyyy-MM-dd");
 }
 
@@ -231,8 +231,8 @@ function computeEasterSunday(year) {
 
 function computeFrenchHolidaySet(range, timeZone) {
   const set = new Set();
-  const startYear = utcToZonedTime(range.from, timeZone).getFullYear();
-  const endYear = utcToZonedTime(range.to, timeZone).getFullYear();
+  const startYear = toZonedTime(range.from, timeZone).getFullYear();
+  const endYear = toZonedTime(range.to, timeZone).getFullYear();
 
   for (let year = startYear - 1; year <= endYear + 1; year += 1) {
     const easterSunday = computeEasterSunday(year);
@@ -369,12 +369,12 @@ async function buildAvailabilityMatrix(supabase, service, rangeInput) {
 
   let cursor = startOfDay(range.from);
   while (cursor < range.to) {
-    const zonedDate = utcToZonedTime(cursor, schedule.timezone);
+    const zonedDate = toZonedTime(cursor, schedule.timezone);
     const dateKey = format(zonedDate, "yyyy-MM-dd");
 
     if (!shouldSkipBusinessDay(zonedDate, dateKey, closureSet, holidaySet)) {
-      const openUtc = zonedTimeToUtc(`${dateKey}T${schedule.openTime}`, schedule.timezone);
-      const closeUtc = zonedTimeToUtc(`${dateKey}T${schedule.closeTime}`, schedule.timezone);
+      const openUtc = fromZonedTime(`${dateKey}T${schedule.openTime}`, schedule.timezone);
+      const closeUtc = fromZonedTime(`${dateKey}T${schedule.closeTime}`, schedule.timezone);
 
       if (closeUtc > openUtc) {
         staffIds.forEach((staffId) => {
