@@ -31,7 +31,7 @@ const {
   listClosedDays,
 } = require("../repositories/scheduleRepository");
 
-const SCHEDULING_WINDOW_DAYS = 42;
+const SCHEDULING_WINDOW_DAYS = 366;
 
 const bookingRequestSchema = z.object({
   full_name: z.string().min(2).max(120),

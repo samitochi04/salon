@@ -2,6 +2,7 @@ import { Route, Routes, NavLink } from 'react-router-dom';
 import { HomePage } from './pages/HomePage.jsx';
 import { ServicesPage } from './pages/ServicesPage.jsx';
 import { ReservationPage } from './pages/ReservationPage.jsx';
+import { AboutPage } from './pages/AboutPage.jsx';
 import { DashboardPage } from './pages/DashboardPage.jsx';
 import { useAuth } from './providers/AuthProvider.jsx';
 import { NewsletterCallout } from './components/NewsletterCallout.jsx';
@@ -10,6 +11,7 @@ const navigation = [
   { to: '/', label: 'Accueil' },
   { to: '/services', label: 'Rituels' },
   { to: '/reservation', label: 'Réserver' },
+  { to: '/a-propos', label: 'À propos' },
   { to: '/dashboard', label: 'Espace équipe' },
 ];
 
@@ -63,6 +65,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/reservation" element={<ReservationPage />} />
+          <Route path="/a-propos" element={<AboutPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route
             path="*"

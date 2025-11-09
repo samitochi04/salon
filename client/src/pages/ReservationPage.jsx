@@ -3,16 +3,23 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import {
   addDays,
+  addMonths,
+  eachMonthOfInterval,
+  endOfMonth,
   endOfWeek,
+  isSameMonth,
   format,
   parseISO,
   startOfDay,
+  startOfMonth,
   startOfWeek,
+  subMonths,
+  differenceInCalendarMonths,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { fetchAvailability, fetchServices, createBooking } from '../services/apiClient.js';
 
-const RANGE_DAYS = 21;
+const RANGE_DAYS = 365;
 const WEEKDAY_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
 function buildRange(from = new Date()) {
@@ -32,6 +39,7 @@ export function ReservationPage() {
   const [selectedServiceSlug, setSelectedServiceSlug] = useState(preselected ?? '');
   const [selectedDateKey, setSelectedDateKey] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
+  const [visibleMonth, setVisibleMonth] = useState(() => startOfMonth(new Date()));
 
   const { data: services = [] } = useQuery({ queryKey: ['services'], queryFn: fetchServices });
 
@@ -84,12 +92,33 @@ export function ReservationPage() {
     () => new Set(availableDates),
     [availableDates],
   );
+
+  const monthsInRange = useMemo(() => {
+    if (!windowInfo.from || !windowInfo.to) return [];
+    const start = startOfMonth(parseISO(windowInfo.from));
+    const end = startOfMonth(parseISO(windowInfo.to));
+    return eachMonthOfInterval({ start, end });
+  }, [windowInfo.from, windowInfo.to]);
+
+  useEffect(() => {
+    if (monthsInRange.length === 0) return;
+    const firstMonth = monthsInRange[0];
+    const lastMonth = monthsInRange[monthsInRange.length - 1];
+    if (differenceInCalendarMonths(visibleMonth, firstMonth) < 0) {
+      setVisibleMonth(firstMonth);
+    } else if (differenceInCalendarMonths(visibleMonth, lastMonth) > 0) {
+      setVisibleMonth(lastMonth);
+    }
+  }, [monthsInRange, visibleMonth]);
+
   const calendarWeeks = useMemo(() => {
-    if (!windowInfo.from) return [];
-    const rangeStart = parseISO(windowInfo.from);
-    const rangeEnd = windowInfo.to ? parseISO(windowInfo.to) : addDays(rangeStart, RANGE_DAYS);
-    const gridStart = startOfWeek(rangeStart, { weekStartsOn: 1 });
-    const gridEnd = endOfWeek(addDays(rangeEnd, -1), { weekStartsOn: 1 });
+    if (!windowInfo.from || !windowInfo.to) return [];
+    const rangeStart = startOfDay(parseISO(windowInfo.from));
+    const rangeEnd = parseISO(windowInfo.to);
+    const monthStart = startOfMonth(visibleMonth);
+    const monthEnd = endOfMonth(visibleMonth);
+    const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
     const weeks = [];
     let cursor = gridStart;
     while (cursor <= gridEnd) {
@@ -97,19 +126,30 @@ export function ReservationPage() {
       for (let index = 0; index < 7; index += 1) {
         const date = addDays(cursor, index);
         const dateKey = format(date, 'yyyy-MM-dd');
-        const isWithinRange = date >= startOfDay(rangeStart) && date < rangeEnd;
+        const isWithinRange = date >= rangeStart && date < rangeEnd;
         week.push({
           date,
           dateKey,
           isWithinRange,
-          isAvailable: availableDateSet.has(dateKey),
+          isCurrentMonth: isSameMonth(date, visibleMonth),
+          isAvailable: isWithinRange && availableDateSet.has(dateKey),
         });
       }
       weeks.push(week);
       cursor = addDays(cursor, 7);
     }
     return weeks;
-  }, [availableDateSet, windowInfo.from, windowInfo.to]);
+  }, [availableDateSet, visibleMonth, windowInfo.from, windowInfo.to]);
+
+  const canGoPreviousMonth = useMemo(() => {
+    if (monthsInRange.length === 0) return false;
+    return differenceInCalendarMonths(visibleMonth, monthsInRange[0]) > 0;
+  }, [monthsInRange, visibleMonth]);
+
+  const canGoNextMonth = useMemo(() => {
+    if (monthsInRange.length === 0) return false;
+    return differenceInCalendarMonths(monthsInRange[monthsInRange.length - 1], visibleMonth) > 0;
+  }, [monthsInRange, visibleMonth]);
 
   useEffect(() => {
     if (availableDates.length === 0) {
@@ -122,6 +162,14 @@ export function ReservationPage() {
       setSelectedTime(null);
     }
   }, [availableDates, availableDateSet, selectedDateKey]);
+
+  useEffect(() => {
+    if (!selectedDateKey) return;
+    const selectedMonth = startOfMonth(parseISO(selectedDateKey));
+    if (differenceInCalendarMonths(selectedMonth, visibleMonth) !== 0) {
+      setVisibleMonth(selectedMonth);
+    }
+  }, [selectedDateKey, visibleMonth]);
 
   function handleSlotSelection(dateKey, timeLabel) {
     setSelectedDateKey(dateKey);
@@ -198,15 +246,48 @@ export function ReservationPage() {
       </section>
 
       <section className="space-y-6">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-3xl text-rb-brown">2. Sélectionnez une date</h2>
-          {windowInfo.from && windowInfo.to && (
-            <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
-              {format(parseISO(windowInfo.from), 'd MMM', { locale: fr })} —
-              {format(parseISO(windowInfo.to), 'd MMM', { locale: fr })}
+          <div className="hidden items-center gap-3 sm:flex">
+            <button
+              type="button"
+              onClick={() => setVisibleMonth((current) => subMonths(current, 1))}
+              disabled={!canGoPreviousMonth}
+              className="rounded-full border border-rb-brown/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-rb-brown hover:border-rb-gold hover:text-rb-gold disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              ←
+            </button>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+              {format(visibleMonth, 'MMMM yyyy', { locale: fr })}
             </p>
-          )}
+            <button
+              type="button"
+              onClick={() => setVisibleMonth((current) => addMonths(current, 1))}
+              disabled={!canGoNextMonth}
+              className="rounded-full border border-rb-brown/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-rb-brown hover:border-rb-gold hover:text-rb-gold disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              →
+            </button>
+          </div>
         </div>
+        {monthsInRange.length > 0 && (
+          <div className="sm:hidden">
+            <select
+              value={format(visibleMonth, 'yyyy-MM')}
+              onChange={(event) => {
+                const [year, month] = event.target.value.split('-').map(Number);
+                setVisibleMonth(new Date(year, month - 1, 1));
+              }}
+              className="w-full rounded-full border border-rb-brown/20 bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-rb-brown"
+            >
+              {monthsInRange.map((monthDate) => (
+                <option key={monthDate.toISOString()} value={format(monthDate, 'yyyy-MM')}>
+                  {format(monthDate, 'MMMM yyyy', { locale: fr })}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         {availabilityQuery.isLoading && (
           <p className="text-sm text-slate-600">Recherche des créneaux disponibles…</p>
         )}
@@ -219,8 +300,8 @@ export function ReservationPage() {
           !availabilityQuery.isError &&
           availableDates.length === 0 && (
             <p className="rounded-3xl bg-white/70 p-6 text-sm text-slate-600">
-              Aucun créneau n’est disponible sur les trois prochaines semaines. Contactez notre concierge pour une
-              disponibilité sur mesure.
+              Aucun créneau n’est disponible sur l’année à venir. Contactez notre concierge pour une disponibilité sur
+              mesure.
             </p>
           )}
         {!availabilityQuery.isError && calendarWeeks.length > 0 && (
@@ -254,7 +335,9 @@ export function ReservationPage() {
                               ? 'cursor-not-allowed bg-white/40 text-slate-400'
                               : isSelected
                                 ? 'border border-rb-brown bg-rb-brown text-rb-cream'
-                                : 'border border-transparent bg-white text-rb-brown hover:border-rb-gold'
+                                : day.isCurrentMonth
+                                  ? 'border border-transparent bg-white text-rb-brown hover:border-rb-gold'
+                                  : 'border border-transparent bg-white/60 text-slate-400'
                         }`}
                       >
                         <span className="text-[0.65rem] uppercase tracking-[0.3em]">
