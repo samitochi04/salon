@@ -27,7 +27,8 @@ async function getServiceBySlug(supabase, slug) {
         name,
         description,
         duration_minutes,
-        price_cents
+        price_cents,
+        active
       `,
     )
     .eq("slug", slug)
@@ -35,8 +36,27 @@ async function getServiceBySlug(supabase, slug) {
     .maybeSingle();
 }
 
+async function createService(supabase, payload) {
+  return salon(supabase)
+    .from("services")
+    .insert(payload)
+    .select(
+      `
+        id,
+        slug,
+        name,
+        description,
+        duration_minutes,
+        price_cents,
+        active
+      `,
+    )
+    .maybeSingle();
+}
+
 module.exports = {
   listActiveServices,
   getServiceBySlug,
+  createService,
 };
 

@@ -108,3 +108,12 @@ export async function deleteClosedDay({ token, closureId }) {
     },
   });
 }
+
+export async function createAdminService({ token, payload }) {
+  const { data } = await api.post('/api/admin/services', payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return data.data;
+}

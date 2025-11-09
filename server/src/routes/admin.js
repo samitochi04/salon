@@ -13,6 +13,7 @@ router.put("/schedule", adminController.updateSchedule);
 router.get("/closures", adminController.listClosures);
 router.post("/closures", adminController.createClosure);
 router.delete("/closures/:closureId", adminController.deleteClosure);
+router.post("/services", adminController.createService);
 
 module.exports = router;
 

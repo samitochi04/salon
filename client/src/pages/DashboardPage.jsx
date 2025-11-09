@@ -10,6 +10,7 @@ import {
   fetchClosedDays,
   createClosedDay,
   deleteClosedDay,
+  createAdminService,
 } from '../services/apiClient.js';
 import { useAuth } from '../providers/AuthProvider.jsx';
 import { useStaffProfile } from '../hooks/useStaffProfile.js';
@@ -99,7 +100,7 @@ export function DashboardPage() {
         {activeTab === 'overview' && <OverviewSection staff={staff} token={token} />}
         {activeTab === 'bookings' && <BookingsSection token={token} />}
         {activeTab === 'availability' && <AvailabilitySection staff={staff} token={token} />}
-        {activeTab === 'services' && <ServicesSection />}
+        {activeTab === 'services' && <ServicesSection token={token} />}
       </div>
     </DashboardShell>
   );
@@ -651,7 +652,7 @@ function AvailabilitySection({ staff, token }) {
   );
 }
 
-function ServicesSection() {
+function ServicesSection({ token }) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
     name: '',
@@ -674,10 +675,7 @@ function ServicesSection() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (payload) => {
-      const { error } = await supabaseClient.schema('salon').from('services').insert(payload);
-      if (error) throw new Error(error.message);
-    },
+    mutationFn: (payload) => createAdminService({ token, payload }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dashboard-services'] });
       setForm({ name: '', description: '', duration_minutes: 60, price_cents: 12000 });
@@ -768,7 +766,7 @@ function ServicesSection() {
         <button
           type="submit"
           className="inline-flex items-center justify-center rounded-full bg-rb-brown px-4 py-2 text-sm font-semibold text-rb-cream hover:bg-rb-gold hover:text-rb-brown"
-          disabled={createMutation.isPending}
+          disabled={createMutation.isPending || !token}
         >
           Ajouter à la carte
         </button>

@@ -17,7 +17,11 @@ const { notifyCustomerBookingReceived, notifyAdminBookingReceived, notifyCustome
 const { DEFAULT_OPERATING_SETTINGS } = require("./scheduleService");
 const { createHttpError } = require("../utils/httpError");
 const { unwrap } = require("../utils/supabase");
-const { listStaffForService } = require("../repositories/staffRepository");
+const {
+  listStaffForService,
+  listActiveStaff,
+  linkStaffToService,
+} = require("../repositories/staffRepository");
 const {
   listBusyBlocks,
   listBookingsForStaff,
@@ -317,7 +321,32 @@ function generateSlotsForShift(shift, durationMs, busyByStaff, range) {
 
 async function buildAvailabilityMatrix(supabase, service, rangeInput) {
   const range = normalizeRange(rangeInput);
-  const staffIds = await getStaffIdsForService(supabase, service.id);
+  let staffIds = await getStaffIdsForService(supabase, service.id);
+
+  if (!staffIds.length) {
+    const activeStaff = unwrap(await listActiveStaff(supabase));
+    const activeStaffIds = activeStaff
+      .map((staff) => staff?.id)
+      .filter((id) => typeof id === "string");
+
+    if (activeStaffIds.length) {
+      const linkResult = await linkStaffToService(
+        supabase,
+        activeStaffIds.map((staffId) => ({
+          staff_id: staffId,
+          service_id: service.id,
+        })),
+      );
+      if (linkResult.error) {
+        throw createHttpError(500, linkResult.error.message, {
+          details: linkResult.error.details,
+          hint: linkResult.error.hint,
+        });
+      }
+    }
+
+    staffIds = activeStaffIds;
+  }
 
   if (!staffIds.length) {
     return {

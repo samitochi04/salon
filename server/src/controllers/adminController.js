@@ -1,5 +1,6 @@
 const bookingService = require("../services/bookingService");
 const scheduleService = require("../services/scheduleService");
+const catalogService = require("../services/catalogService");
 const { asyncHandler } = require("../utils/asyncHandler");
 
 const listBookings = asyncHandler(async (req, res) => {
@@ -42,6 +43,11 @@ const deleteClosure = asyncHandler(async (req, res) => {
   res.status(204).end();
 });
 
+const createService = asyncHandler(async (req, res) => {
+  const service = await catalogService.createCatalogService(req.supabase, req.body);
+  res.status(201).json({ data: service });
+});
+
 module.exports = {
   listBookings,
   updateBooking,
@@ -50,5 +56,6 @@ module.exports = {
   listClosures,
   createClosure,
   deleteClosure,
+  createService,
 };
 
