@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Route, Routes, NavLink } from 'react-router-dom';
 import { HomePage } from './pages/HomePage.jsx';
 import { ServicesPage } from './pages/ServicesPage.jsx';
@@ -16,13 +17,14 @@ const navigation = [
 ];
 
 export default function App() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-rb-cream text-slate-900">
       <Announcement />
       <header className="sticky top-0 z-50 border-b border-slate-200/60 bg-rb-cream/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <NavLink to="/" className="group inline-flex items-center gap-2">
             <div className="rounded-full bg-rb-gold/20 p-2 text-rb-brown shadow-soft transition transform group-hover:-translate-y-0.5">
               RB
@@ -36,6 +38,37 @@ export default function App() {
               </p>
             </div>
           </NavLink>
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-full bg-rb-brown/10 px-3 py-2 text-sm font-semibold text-rb-brown transition hover:bg-rb-brown/20 md:hidden"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-expanded={isMobileMenuOpen}
+            aria-label="Ouvrir le menu de navigation"
+          >
+            <span className="sr-only">Menu</span>
+            <svg
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              {isMobileMenuOpen ? (
+                <>
+                  <path d="M6 18L18 6" />
+                  <path d="M6 6l12 12" />
+                </>
+              ) : (
+                <>
+                  <path d="M4 6h16" />
+                  <path d="M4 12h16" />
+                  <path d="M4 18h16" />
+                </>
+              )}
+            </svg>
+          </button>
           <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
             {navigation.map((item) => (
               <NavLink
@@ -59,6 +92,33 @@ export default function App() {
             Réserver un rituel
           </NavLink>
         </div>
+        {isMobileMenuOpen && (
+          <div className="border-t border-slate-200/60 bg-rb-cream/95 backdrop-blur md:hidden">
+            <nav className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 text-sm font-medium sm:px-6">
+              {navigation.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `rounded-full px-4 py-2 transition ${
+                      isActive ? 'bg-rb-brown text-rb-cream' : 'text-slate-700 hover:bg-rb-gold/20'
+                    }`
+                  }
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+              <NavLink
+                to="/reservation"
+                className="rounded-full bg-rb-brown px-4 py-2 text-center text-sm font-semibold text-rb-cream transition hover:bg-rb-gold"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Réserver un rituel
+              </NavLink>
+            </nav>
+          </div>
+        )}
       </header>
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pb-20 pt-12 sm:px-6 lg:px-8">
         <Routes>
